@@ -11,5 +11,9 @@ public class Main {
         taskManager.updateRegularTaskById(task1.getId(), "Полить цветы", "На всех окнах", TaskStatus.DONE);
         task1 = taskManager.getRegularTaskById(0);
         System.out.println(task1);
+        taskManager.deleteAllRegularTasks();
+        task1 = taskManager.getRegularTaskById(0);
+        Task task2 = taskManager.getRegularTaskById(1);
+        System.out.println(task1 + " " + task2);
     }
 }

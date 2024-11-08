@@ -15,4 +15,12 @@ public class TaskManager {
         tasksRegular.addTask(id, new Task(id, name, description, status));
     }
 
+    public void deleteRegularTaskById(Integer id) {
+        tasksRegular.deleteTaskById(id);
+    }
+
+    public void deleteAllRegularTasks() {
+        tasksRegular.deleteAllTasks();
+    }
+
 }
