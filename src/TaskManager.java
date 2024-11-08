@@ -11,4 +11,8 @@ public class TaskManager {
         return tasksRegular.getTaskById(id);
     }
 
+    public void updateRegularTaskById(Integer id, String name, String description, TaskStatus status) {
+        tasksRegular.addTask(id, new Task(id, name, description, status));
+    }
+
 }
