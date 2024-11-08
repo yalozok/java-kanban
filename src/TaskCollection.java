@@ -9,7 +9,14 @@ public class TaskCollection {
     }
 
     public Task getTaskById (Integer id) {
+        if(!tasksList.containsKey(id)) {
+            return null;
+        }
         return tasksList.get(id);
+    }
+
+    public void updateTask(Integer id, Task task) {
+        tasksList.put(id, task);
     }
 
     public void deleteTaskById(Integer id) {
