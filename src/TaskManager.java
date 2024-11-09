@@ -1,12 +1,10 @@
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class TaskManager {
     private static Integer countTask = 0;
-    Map<Integer, Task> tasksRegular = new HashMap<>();
-    Map<Integer, Epic> tasksEpic = new HashMap<>();
-    Map<Integer, SubTask> subTasks = new HashMap<>();
+    private Map<Integer, Task> tasksRegular = new HashMap<>();
+    private Map<Integer, Epic> tasksEpic = new HashMap<>();
+    private Map<Integer, SubTask> subTasks = new HashMap<>();
 
     public void addRegularTask(String name, String description) {
         tasksRegular.put(countTask, new Task(countTask, name, description, TaskStatus.NEW));
@@ -22,11 +20,31 @@ public class TaskManager {
         return task;
     }
 
+    public List<Task> getListOfRegularTasks() {
+        if(tasksRegular.isEmpty()) {
+            System.out.println("Ни одной обычной задачи пока не добавлено");
+            return null;
+        }
+        List<Task> list = new ArrayList<>();
+        for(Integer id : tasksRegular.keySet()) {
+            list.add(tasksRegular.get(id));
+        }
+        return list;
+    }
+
+    // update function takes as a parameters individual fields of `Task` instead of the entire `Task` object
+    // Reasons for this design choice:
+    // 1. Simplifies the `Main` class by avoiding unnecessary `Task` object creation
+    // 2. Supports scalability by enabling targeted updates to specific `Task` fields in the future
+
     public void updateRegularTaskById(Integer id, String name, String description, TaskStatus status) {
-        if(getRegularTaskById(id) == null) {
+        Task task = getRegularTaskById(id);
+        if(task == null) {
             return;
         }
-        tasksRegular.put(id, new Task(id, name, description, status));
+        task.setName(name);
+        task.setDescription(description);
+        task.setStatus(status);
         System.out.println("Обычная задача с id: " + id + " обновлена");
     }
 
@@ -40,6 +58,7 @@ public class TaskManager {
 
     public void deleteAllRegularTasks() {
         if(tasksRegular.isEmpty()) {
+            System.out.println("Обычных задач еще не создано");
             return;
         }
         tasksRegular.clear();
@@ -52,22 +71,9 @@ public class TaskManager {
         countTask++;
     }
 
-    public Epic getEpicById(Integer id) {
-        Epic task = (Epic) tasksEpic.get(id);
-        if (task == null) {
-            System.out.println("Нет epic задачи c id: " + id);
-        }
-        return task;
-    }
-
-    public void updateEpicById(Integer id, String name, String description) {
-        Epic epicTask = getEpicById(id);
-        if(epicTask == null) {
-            return;
-        }
-
+    private void updateEpicStatus (Epic epic) {
         TaskStatus status;
-        List<Integer> listSubTaskId = epicTask.getListSubTaskId();
+        List<Integer> listSubTaskId = epic.getListSubTaskId();
 
         if(listSubTaskId.isEmpty()) {
             status = TaskStatus.NEW;
@@ -76,24 +82,52 @@ public class TaskManager {
             for(Integer subTaskId : listSubTaskId) {
                 if (getSubTaskById(subTaskId).getStatus() != status) {
                     status = TaskStatus.IN_PROGRESS;
-                    return;
                 }
             }
         }
-        tasksRegular.put(id, new Task(id, name, description, status));
+        epic.setStatus(status);
+    }
+
+    public Epic getEpicById(Integer id) {
+        Epic task = tasksEpic.get(id);
+        if (task == null) {
+            System.out.println("Нет epic задачи c id: " + id);
+        }
+        return task;
+    }
+
+    public List<Epic> getListOfEpic() {
+        if(tasksEpic.isEmpty()) {
+            System.out.println("Ни одной задачи типа epic пока не добавлено");
+            return null;
+        }
+        List<Epic> list = new ArrayList<>();
+        for(Integer id : tasksEpic.keySet()) {
+            list.add(tasksEpic.get(id));
+        }
+        return list;
+    }
+
+    public void updateEpicById(Integer id, String name, String description) {
+        Epic epic = getEpicById(id);
+        if(epic == null) {
+            return;
+        }
+        epic.setName(name);
+        epic.setDescription(description);
         System.out.println("Epic задача с id: " + id + " обновлена");
     }
 
     public void deleteEpicTaskById(Integer id) {
-        Epic epicTask = getEpicById(id);
-        if(epicTask != null) {
+        Epic epic = getEpicById(id);
+        if(epic == null) {
             return;
         }
 
-        List<Integer> listSubTaskId = epicTask.getListSubTaskId();
+        List<Integer> listSubTaskId = epic.getListSubTaskId();
         if(!listSubTaskId.isEmpty()) {
             for(Integer subTaskId : listSubTaskId) {
-                deleteSubTaskById(subTaskId);
+                subTasks.remove(subTaskId);
             }
         }
         tasksEpic.remove(id);
@@ -102,42 +136,85 @@ public class TaskManager {
 
     public void deleteAllEpicTasks() {
         if(tasksEpic.isEmpty()) {
+            System.out.println("Epic задач еще не создано");
             return;
         }
-        for (Integer id : tasksEpic.keySet()) {
-            deleteEpicTaskById(id);
+        while (!tasksEpic.isEmpty()) {
+            List<Integer> listId = new ArrayList<>(tasksEpic.keySet());
+            deleteEpicTaskById(listId.getFirst());
         }
-
         System.out.println("Все epic задачи c их подзадачами удалены");
     }
 
     public void addSubTask(String name, String description, Integer epicId) {
         Epic epic = getEpicById(epicId);
         SubTask subTask = epic.createNewSubTask(countTask, name, description);
+        subTask.setEpicId(epicId);
         subTasks.put(countTask, subTask);
         System.out.println("Добавлена подзадача с id: " + countTask);
         countTask++;
     }
 
     public SubTask getSubTaskById(Integer id) {
-        SubTask task = (SubTask) subTasks.get(id);
+        SubTask task = subTasks.get(id);
         if (task == null) {
             System.out.println("Нет  подзадачи c id: " + id);
         }
         return task;
     }
 
+    public List<SubTask> getListOfSubtasks(List<Integer> ids) {
+        List<SubTask> list = new ArrayList<>();
+        for(Integer id : ids) {
+            list.add(subTasks.get(id));
+        }
+        return list;
+    }
+
+    public List<SubTask> getListOfAllSubTasks() {
+        return getListOfSubtasks(new ArrayList<>(subTasks.keySet()));
+    }
+
+    public List<SubTask> getListOfSubTasksByEpicId(Integer id) {
+        Epic epic = getEpicById(id);
+        if(epic == null) {
+            return null;
+        }
+        return getListOfSubtasks(epic.getListSubTaskId());
+    }
+
     public void updateSubTaskById(Integer id, String name, String description, TaskStatus status) {
-        subTasks.put(id, new SubTask(id, name, description, status));
-        Epic epic = getEpicById(getSubTaskById(id).getEpicIdBySubtask());
-        updateEpicById(epic.getId(), epic.getName(), epic.getDescription());
+        SubTask subTask = getSubTaskById(id);
+        if(subTask == null) {
+            return;
+        }
+        subTask.setName(name);
+        subTask.setDescription(description);
+        subTask.setStatus(status);
+        updateEpicStatus(getEpicById(subTask.getEpicId()));
     }
 
     public void deleteSubTaskById(Integer id) {
-        if(getRegularTaskById(id) == null) {
+        SubTask subTask = getSubTaskById(id);
+        if(subTask == null) {
             return;
         }
+        Epic epic = tasksEpic.get(subTask.getEpicId());
+        epic.deleteSubTaskIdFromEpic(subTask.getId());
+        updateEpicStatus(epic);
         subTasks.remove(id);
         System.out.println("Подзадача с id: " + id + " удалена");
+    }
+
+    public void deleteAllSubTasks(){
+        if(subTasks.isEmpty()) {
+            System.out.println("Подзадач еще не создано");
+            return;
+        }
+        while (!subTasks.isEmpty()) {
+            List<Integer> listId = new ArrayList<>(subTasks.keySet());
+            deleteSubTaskById(listId.getFirst());
+        }
+        System.out.println("Все подзадачи удалены");
     }
 }
