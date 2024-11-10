@@ -6,10 +6,18 @@ public class TaskManager {
     private Map<Integer, Epic> tasksEpic = new HashMap<>();
     private Map<Integer, SubTask> subTasks = new HashMap<>();
 
-    public void addRegularTask(String name, String description) {
-        tasksRegular.put(countTask, new Task(countTask, name, description, TaskStatus.NEW));
-        System.out.println("Добавлена обычная задача с id: " + countTask);
+    private static Integer getId() {
+        return countTask;
+    }
+
+    private static void updateId() {
         countTask++;
+    }
+
+    public void addRegularTask(String name, String description) {
+        tasksRegular.put(getId(), new Task(getId(), name, description, TaskStatus.NEW));
+        System.out.println("Добавлена обычная задача с id: " + getId());
+        updateId();
     }
 
     public Task getRegularTaskById(Integer id) {
@@ -66,9 +74,9 @@ public class TaskManager {
     }
 
     public void addEpicTask(String name, String description) {
-        tasksEpic.put(countTask, new Epic(countTask, name, description, TaskStatus.NEW));
-        System.out.println("Добавлена epic задача с id: " + countTask);
-        countTask++;
+        tasksEpic.put(getId(), new Epic(getId(), name, description, TaskStatus.NEW));
+        System.out.println("Добавлена epic задача с id: " + getId());
+        updateId();
     }
 
     private void updateEpicStatus (Epic epic) {
@@ -148,11 +156,11 @@ public class TaskManager {
 
     public void addSubTask(String name, String description, Integer epicId) {
         Epic epic = getEpicById(epicId);
-        SubTask subTask = epic.createNewSubTask(countTask, name, description);
+        SubTask subTask = epic.createNewSubTask(getId(), name, description);
         subTask.setEpicId(epicId);
-        subTasks.put(countTask, subTask);
-        System.out.println("Добавлена подзадача с id: " + countTask);
-        countTask++;
+        subTasks.put(getId(), subTask);
+        System.out.println("Добавлена подзадача с id: " + getId());
+        updateId();
     }
 
     public SubTask getSubTaskById(Integer id) {
