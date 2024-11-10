@@ -5,17 +5,6 @@ public class Task {
     protected TaskStatus status;
     private final TaskType type = TaskType.REGULAR;
 
-    @Override
-    public String toString() {
-        return "Task{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", status=" + status +
-                ", type=" + type +
-                '}';
-    }
-
     public Task(Integer id, String name, String description, TaskStatus status) {
         this.id = id;
         this.name = name;
@@ -52,5 +41,16 @@ public class Task {
 
     public void setStatus(TaskStatus status) {
         this.status = status;
+    }
+
+    @Override
+    public String toString() {
+        return "Task{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", status=" + status +
+                ", type=" + type +
+                '}';
     }
 }
