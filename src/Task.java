@@ -1,9 +1,14 @@
 public class Task {
-    protected final Integer id;
+    protected Integer id;
     protected String name;
     protected String description;
     protected TaskStatus status;
     private final TaskType type = TaskType.REGULAR;
+
+    public Task(String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
 
     public Task(Integer id, String name, String description, TaskStatus status) {
         this.id = id;
@@ -11,12 +16,17 @@ public class Task {
         this.description = description;
         this.status = status;
     }
+
     public TaskType getType() {
         return type;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getName() {
