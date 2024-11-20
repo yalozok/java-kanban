@@ -9,7 +9,7 @@ public class InMemoryTaskManager implements TaskManager {
     private Map<Integer, Task> tasks = new HashMap<>();
     private Map<Integer, Epic> epics = new HashMap<>();
     private Map<Integer, SubTask> subTasks = new HashMap<>();
-    private List<Task> history = new ArrayList<>();
+    private HistoryManager historyManager = new Manager().getDefaultHistory();
 
     private static Integer getId() {
         return countTask;
@@ -37,7 +37,7 @@ public class InMemoryTaskManager implements TaskManager {
         if(!hasTask(id)) {
             return null;
         }
-        putInHistory(tasks.get(id));
+        historyManager.add(tasks.get(id));
         return tasks.get(id);
     }
 
@@ -129,7 +129,7 @@ public class InMemoryTaskManager implements TaskManager {
         if(!hasEpic(id)) {
             return null;
         }
-        putInHistory(epics.get(id));
+        historyManager.add(epics.get(id));
         return epics.get(id);
     }
 
@@ -196,7 +196,7 @@ public class InMemoryTaskManager implements TaskManager {
         if(!hasSubTask(id)) {
             return null;
         }
-        putInHistory(subTasks.get(id));
+        historyManager.add(subTasks.get(id));
         return subTasks.get(id);
     }
 
@@ -254,14 +254,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public List<Task> getHistory() {
-        return history;
-    }
-
-    private <T extends Task> void putInHistory(T task) {
-        if(history.size() == 10) {
-            history.removeFirst();
-        }
-        history.add(task);
+        return historyManager.getHistory();
     }
 
 }
