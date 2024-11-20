@@ -1,7 +1,7 @@
 public class Main {
 
     public static void main(String[] args) {
-        TaskManager taskManager = new TaskManager();
+        InMemoryTaskManager taskManager = new InMemoryTaskManager();
         System.out.println("Поехали!");
 
         System.out.println("TASK CREATION");
@@ -39,7 +39,7 @@ public class Main {
         printListOfTasks(taskManager);
     }
 
-    private static void printListOfTasks(TaskManager taskManager) {
+    private static void printListOfTasks(InMemoryTaskManager taskManager) {
         System.out.println(taskManager.getAllTasks());
         System.out.println(taskManager.getAllEpics());
         System.out.println(taskManager.getAllSubTasks());
