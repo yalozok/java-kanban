@@ -33,6 +33,21 @@ public class Main {
         System.out.println(taskManager.getAllSubTasksByEpic(epic1.getId()));
         printListOfTasks(taskManager);
 
+        System.out.println("HISTORY");
+        taskManager.getTaskById(task1.getId());
+        taskManager.getTaskById(task2.getId());
+        taskManager.getEpicById(epic1.getId());
+        taskManager.getSubTaskById(subTask1.getId());
+        taskManager.getTaskById(task1.getId());
+        taskManager.getTaskById(task2.getId());
+        taskManager.getEpicById(epic1.getId());
+        taskManager.getSubTaskById(subTask1.getId());
+        taskManager.getTaskById(task1.getId());
+        taskManager.getTaskById(task2.getId());
+        taskManager.getEpicById(epic1.getId());
+        taskManager.getSubTaskById(subTask1.getId());
+        System.out.println(taskManager.getHistory());
+
         System.out.println("TASK DELETION");
         taskManager.deleteTaskById(task1.getId());
         taskManager.deleteEpicById(epic1.getId());
