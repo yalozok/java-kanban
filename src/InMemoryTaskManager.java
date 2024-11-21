@@ -21,11 +21,13 @@ public class InMemoryTaskManager implements TaskManager {
 
     //TASK
     @Override
-    public void addTask(Task task) {
-        task.setId(getId());
+    public Integer addTask(Task task) {
+        Integer id = getId();
+        task.setId(id);
         task.setStatus(TaskStatus.NEW);
-        tasks.put(getId(), task);
+        tasks.put(id, task);
         updateId();
+        return id;
     }
 
     private boolean hasTask(Integer id) {
@@ -34,7 +36,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Task getTaskById(Integer id) {
-        if(!hasTask(id)) {
+        if (!hasTask(id)) {
             return null;
         }
         historyManager.add(tasks.get(id));
@@ -81,11 +83,13 @@ public class InMemoryTaskManager implements TaskManager {
 
     //    EPIC
     @Override
-    public void addEpic(Epic epic) {
-        epic.setId(getId());
+    public Integer addEpic(Epic epic) {
+        Integer id = getId();
+        epic.setId(id);
         epic.setStatus(TaskStatus.NEW);
-        epics.put(getId(), epic);
+        epics.put(id, epic);
         updateId();
+        return id;
     }
 
     private boolean hasEpic(Integer id) {
@@ -126,7 +130,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Epic getEpicById(Integer id) {
-        if(!hasEpic(id)) {
+        if (!hasEpic(id)) {
             return null;
         }
         historyManager.add(epics.get(id));
@@ -175,17 +179,19 @@ public class InMemoryTaskManager implements TaskManager {
 
     //    SUBTASK
     @Override
-    public void addSubTask(SubTask subTask, Integer epicId) {
+    public Integer addSubTask(SubTask subTask, Integer epicId) {
         if (!hasEpic(epicId)) {
-            return;
+            return null;
         }
-        subTask.setId(getId());
+        Integer id = getId();
+        subTask.setId(id);
         subTask.setStatus(TaskStatus.NEW);
         subTask.setEpicId(epicId);
-        subTasks.put(getId(), subTask);
-        setSubTaskIdToEpic(getId(), epicId);
+        subTasks.put(id, subTask);
+        setSubTaskIdToEpic(id, epicId);
         updateEpicStatus(epicId);
         updateId();
+        return id;
     }
 
     private boolean hasSubTask(Integer id) {
@@ -193,7 +199,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     public SubTask getSubTaskById(Integer id) {
-        if(!hasSubTask(id)) {
+        if (!hasSubTask(id)) {
             return null;
         }
         historyManager.add(subTasks.get(id));
@@ -223,7 +229,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void updateSubTask(SubTask subTask) {
-        if (!hasSubTask(subTask.getId())) {
+        if (!hasSubTask(subTask.getId()) || !hasEpic(subTask.getEpicId())) {
             return;
         }
         subTasks.put(subTask.getId(), subTask);

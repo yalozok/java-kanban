@@ -1,7 +1,7 @@
 import java.util.List;
 
 public interface TaskManager {
-    void addTask(Task task);
+    Integer addTask(Task task);
 
     Task getTaskById(Integer id);
 
@@ -13,7 +13,7 @@ public interface TaskManager {
 
     void deleteAllTasks();
 
-    void addEpic(Epic epic);
+    Integer addEpic(Epic epic);
 
     Epic getEpicById(Integer id);
 
@@ -25,7 +25,7 @@ public interface TaskManager {
 
     void deleteAllEpics();
 
-    void addSubTask(SubTask subTask, Integer epicId);
+    Integer addSubTask(SubTask subTask, Integer epicId);
 
     SubTask getSubTaskById(Integer id);
 
