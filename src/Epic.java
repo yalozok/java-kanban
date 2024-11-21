@@ -9,6 +9,11 @@ public class Epic extends Task {
         super(name, description);
     }
 
+    public Epic(Integer id, String name, String description) {
+        super(name, description);
+        this.id = id;
+    }
+
     public Epic(Integer id, String name, String description, List<Integer> subTaskIds) {
         super(name, description);
         this.id = id;
