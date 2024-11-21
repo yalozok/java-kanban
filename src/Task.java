@@ -1,3 +1,5 @@
+import java.util.Objects;
+
 public class Task {
     protected Integer id;
     protected String name;
@@ -62,5 +64,17 @@ public class Task {
                 ", status=" + status +
                 ", type=" + type +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Task task = (Task) o;
+        return Objects.equals(id, task.id) && Objects.equals(name, task.name) && Objects.equals(description, task.description) && status == task.status && type == task.type;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, description, status, type);
     }
 }
