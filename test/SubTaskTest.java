@@ -1,4 +1,5 @@
 import task_manager.model.SubTask;
+import task_manager.model.TaskType;
 import task_manager.model.TaskStatus;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,6 +13,12 @@ class SubTaskTest {
     public void beforeEach() {
         subTask = new SubTask(0, "Помыть посуду", "Загрузить машинку",
                 TaskStatus.IN_PROGRESS, 1);
+    }
+
+    @Test
+    void shouldReturnSubTaskType() {
+        Assertions.assertEquals(TaskType.SUB_TASK, subTask.getType(),
+                "SubTask получает неверный type");
     }
 
     @Test

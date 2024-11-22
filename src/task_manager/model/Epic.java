@@ -4,20 +4,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Epic extends Task {
-    private final TaskType type = TaskType.EPIC;
     private List<Integer> subTaskIds = new ArrayList<>();
 
     public Epic(String name, String description) {
-        super(name, description);
+        super(name, description, TaskType.EPIC);
     }
 
     public Epic(Integer id, String name, String description) {
-        super(name, description);
+        super(name, description, TaskType.EPIC);
         this.id = id;
     }
 
     public Epic(Integer id, String name, String description, List<Integer> subTaskIds) {
-        super(name, description);
+        super(name, description, TaskType.EPIC);
         this.id = id;
         this.subTaskIds = subTaskIds;
     }

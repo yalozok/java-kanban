@@ -7,17 +7,21 @@ public class Task {
     protected String name;
     protected String description;
     protected TaskStatus status;
-    private final TaskType type = TaskType.REGULAR;
+    protected final TaskType type;
 
-    public Task(String name, String description) {
+    protected Task(String name, String description, TaskType type) {
         this.name = name;
         this.description = description;
+        this.type = type;
+    }
+
+    public Task(String name, String description) {
+        this(name, description, TaskType.REGULAR);
     }
 
     public Task(Integer id, String name, String description, TaskStatus status) {
+        this(name, description, TaskType.REGULAR);
         this.id = id;
-        this.name = name;
-        this.description = description;
         this.status = status;
     }
 

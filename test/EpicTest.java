@@ -1,4 +1,5 @@
 import task_manager.model.Epic;
+import task_manager.model.TaskType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,12 @@ class EpicTest {
         subtaskIds.add(1);
         subtaskIds.add(2);
         epic = new Epic(0, "Помыть посуду", "Загрузить машинку", subtaskIds);
+    }
+
+    @Test
+    void shouldReturnEpicType() {
+        Assertions.assertEquals(TaskType.EPIC, epic.getType(),
+                "Epic получает неверный type");
     }
 
     @Test
