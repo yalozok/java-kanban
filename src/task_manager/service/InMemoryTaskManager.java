@@ -49,7 +49,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public List<Task> getAllTasks() {
         if (tasks.isEmpty()) {
-            return null;
+            return new ArrayList<>();
         }
         return createTaskList(tasks);
     }
@@ -143,7 +143,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public List<Epic> getAllEpics() {
         if (epics.isEmpty()) {
-            return null;
+            return new ArrayList<>();
         }
         return createTaskList(epics);
     }
@@ -212,7 +212,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public List<SubTask> getAllSubTasksByEpic(Integer epicId) {
         if (!hasEpic(epicId)) {
-            return null;
+            return new ArrayList<>();
         }
         List<Integer> ids = epics.get(epicId).getSubTaskIds();
         List<SubTask> list = new ArrayList<>();
@@ -225,7 +225,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public List<SubTask> getAllSubTasks() {
         if (subTasks.isEmpty()) {
-            return null;
+            return new ArrayList<>();
         }
         return createTaskList(subTasks);
     }

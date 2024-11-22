@@ -50,7 +50,7 @@ class InMemoryTaskManagerTest {
 
         manager.deleteAllTasks();
         List<Task> tasksEmpty = manager.getAllTasks();
-        Assertions.assertNull(tasksEmpty, "Неверное количество задач");
+        Assertions.assertEquals(0, tasksEmpty.size(), "Неверное количество задач");
     }
 
     @Test
@@ -112,8 +112,8 @@ class InMemoryTaskManagerTest {
         manager.deleteEpicById(epicId);
         List<Epic> epicsAfterDeleting = manager.getAllEpics();
         List<SubTask> subtasksAfterDeleting = manager.getAllSubTasks();
-        Assertions.assertNull(epicsAfterDeleting, "В менеджере есть epics");
-        Assertions.assertNull(subtasksAfterDeleting, "В менеджере есть subTasks");
+        Assertions.assertEquals(0, epicsAfterDeleting.size(), "Неверное количество Epics");
+        Assertions.assertEquals(0, subtasksAfterDeleting.size(), "Неверное количество SubTasks");
 
     }
 
@@ -169,8 +169,9 @@ class InMemoryTaskManagerTest {
 
         manager.deleteSubTaskById(subtaskId);
         List<SubTask> subtasks = manager.getAllSubTasks();
-        Assertions.assertNull(subtasks, "В менеджере есть subtasks");
-        Assertions.assertEquals(0, manager.getEpicById(epicId).getSubTaskIds().size());
+        Assertions.assertEquals(0, subtasks.size(), "Неверное количество subtasks");
+        Assertions.assertEquals(0, manager.getEpicById(epicId).getSubTaskIds().size(),
+                "Неверное количество subtasks в epic");
     }
 
     @Test
