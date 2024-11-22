@@ -1,3 +1,6 @@
+import task_manager.model.*;
+import task_manager.service.*;
+import task_manager.model.TaskStatus;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -56,7 +59,7 @@ class InMemoryTaskManagerTest {
 
         Integer id = manager.addEpic(epic);
         Epic epicSaved = manager.getEpicById(id);
-        Assertions.assertNotNull(epicSaved, "Epic не добавлен");
+        Assertions.assertNotNull(epicSaved, "task_manager.model.Epic не добавлен");
         Assertions.assertEquals(epic, epicSaved, "Epics не совпадают");
 
         List<Epic> epics = manager.getAllEpics();
@@ -76,7 +79,7 @@ class InMemoryTaskManagerTest {
         manager.addSubTask(subTask2, id);
         List<Integer> subTaskIds = epicSaved.getSubTaskIds();
 
-        Assertions.assertNotNull(subTaskIds, "SubTask ids не возвращаются");
+        Assertions.assertNotNull(subTaskIds, "task_manager.model.SubTask ids не возвращаются");
         Assertions.assertEquals(2, subTaskIds.size(), "Количество subtasks не совпадает");
         Assertions.assertEquals(subTask1, manager.getSubTaskById(subTaskIds.getFirst()),
                 "SubTasks не совпадают");
@@ -90,7 +93,7 @@ class InMemoryTaskManagerTest {
         manager.updateEpic(new Epic(id, "Помыть собаку", "Загрузить машинку"));
         Epic epicUpdated = manager.getEpicById(id);
         Assertions.assertEquals(1, manager.getAllEpics().size(), "Неверное количество epics");
-        Assertions.assertNotEquals(epic, epicUpdated, "Epic не обновился");
+        Assertions.assertNotEquals(epic, epicUpdated, "task_manager.model.Epic не обновился");
     }
 
     @Test
@@ -121,10 +124,10 @@ class InMemoryTaskManagerTest {
         Integer subTaskId = manager.addSubTask(subTask, epicId);
 
         List<SubTask> subTasks = manager.getAllSubTasks();
-        Assertions.assertNotNull(subTasks, "SubTask ids не возвращаются");
+        Assertions.assertNotNull(subTasks, "task_manager.model.SubTask ids не возвращаются");
         Assertions.assertEquals(subTask, subTasks.getFirst(), "SubTasks не совпадают");
         Assertions.assertEquals(subTaskId, manager.getEpicById(epicId).getSubTaskIds().getFirst(),
-                "SubTask id не закреплено за epic");
+                "task_manager.model.SubTask id не закреплено за epic");
     }
 
     @Test
@@ -136,7 +139,7 @@ class InMemoryTaskManagerTest {
 
         Integer subTaskId = manager.addSubTask(subTask, epicId);
         Assertions.assertNotEquals(subTaskId, manager.getSubTaskById(subTaskId).getEpicId(),
-                "SubTask id и epic id совпадают");
+                "task_manager.model.SubTask id и epic id совпадают");
     }
 
     @Test
@@ -183,9 +186,9 @@ class InMemoryTaskManagerTest {
         List<Task> history = manager.getHistory();
         Assertions.assertNotNull(history, "Задачи не сохранились в истории");
         Assertions.assertEquals(3, history.size(), "Неверное количество задач");
-        Assertions.assertEquals(epicSaved, history.get(0), "Epic в истории не совпадает");
-        Assertions.assertEquals(subTaskSaved, history.get(1), "SubTask в истории не совпадает");
-        Assertions.assertEquals(taskSaved, history.get(2), "Task в истории не совпадает");
+        Assertions.assertEquals(epicSaved, history.get(0), "task_manager.model.Epic в истории не совпадает");
+        Assertions.assertEquals(subTaskSaved, history.get(1), "task_manager.model.SubTask в истории не совпадает");
+        Assertions.assertEquals(taskSaved, history.get(2), "task_manager.model.Task в истории не совпадает");
 
     }
 

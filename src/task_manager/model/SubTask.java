@@ -1,3 +1,5 @@
+package task_manager.model;
+
 public class SubTask extends Task {
     private final TaskType type = TaskType.SUB_TASK;
     private Integer epicId;
@@ -11,7 +13,7 @@ public class SubTask extends Task {
         this.epicId = epicId;
     }
 
-    void setEpicId(Integer epicId) {
+    public void setEpicId(Integer epicId) {
         this.epicId = epicId;
     }
 
@@ -21,7 +23,7 @@ public class SubTask extends Task {
 
     @Override
     public String toString() {
-        return "SubTask{" +
+        return "task_manager.model.SubTask{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +

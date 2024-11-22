@@ -1,3 +1,7 @@
+package task_manager.service;
+
+import task_manager.model.Task;
+
 import java.util.ArrayList;
 import java.util.List;
 

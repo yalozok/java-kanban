@@ -1,9 +1,11 @@
+package task_manager.service;
+
 public class Manager {
-    TaskManager getDefault() {
+    public TaskManager getDefault() {
         return new InMemoryTaskManager();
     }
 
-    HistoryManager getDefaultHistory() {
+    public HistoryManager getDefaultHistory() {
         return new InMemoryHistoryManager();
     }
 }
