@@ -1,10 +1,6 @@
 package task_manager.service;
 
-import task_manager.model.Epic;
-import task_manager.model.SubTask;
-import task_manager.model.Task;
-import task_manager.model.TaskStatus;
-
+import task_manager.model.*;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
