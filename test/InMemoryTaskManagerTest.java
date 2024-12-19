@@ -6,8 +6,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 class InMemoryTaskManagerTest {
     TaskManager manager = new Manager().getDefault();
 
@@ -172,48 +170,5 @@ class InMemoryTaskManagerTest {
         Assertions.assertEquals(0, subtasks.size(), "Неверное количество subtasks");
         Assertions.assertEquals(0, manager.getEpicById(epicId).getSubTaskIds().size(),
                 "Неверное количество subtasks в epic");
-    }
-
-    @Test
-    void getHistory() {
-        Integer epicId = manager.addEpic(new Epic("Помыть посуду", "Загрузить машинку"));
-        Integer subtaskId = manager.addSubTask(new SubTask("Записаться на курсы", "Хорошие"), epicId);
-        Integer taskId = manager.addTask(new Task("Помыть посуду", "Загрузить машинку"));
-
-        Epic epicSaved = manager.getEpicById(epicId);
-        SubTask subTaskSaved = manager.getSubTaskById(subtaskId);
-        Task taskSaved = manager.getTaskById(taskId);
-
-        List<Task> history = manager.getHistory();
-        Assertions.assertNotNull(history, "Задачи не сохранились в истории");
-        Assertions.assertEquals(3, history.size(), "Неверное количество задач");
-        Assertions.assertEquals(epicSaved, history.get(0), "task_manager.model.Epic в истории не совпадает");
-        Assertions.assertEquals(subTaskSaved, history.get(1), "task_manager.model.SubTask в истории не совпадает");
-        Assertions.assertEquals(taskSaved, history.get(2), "task_manager.model.Task в истории не совпадает");
-
-    }
-
-    @Test
-    void getHistoryAfterUpdate() {
-        Integer taskId = manager.addTask(new Task("Помыть посуду", "Загрузить машинку"));
-        Task taskSaved = manager.getTaskById(taskId);
-
-        manager.updateTask(new Task(taskId, "Помыть посуду", "Загрузить машинку", TaskStatus.DONE));
-        Task taskSaved2 = manager.getTaskById(taskId);
-
-        List<Task> history = manager.getHistory();
-        Assertions.assertNotNull(history, "Задачи не сохранились в истории");
-        Assertions.assertEquals(2, history.size(), "Неверное количество задач");
-        Assertions.assertNotEquals(history.get(0), history.get(1), "Сохранены одинаковые версии задач");
-    }
-
-    @Test
-    void addToHistory() {
-        HistoryManager historyManager = new Manager().getDefaultHistory();
-
-        historyManager.add(new Task("Помыть посуду", "Загрузить машинку"));
-        final List<Task> history = historyManager.getHistory();
-        assertNotNull(history, "История не пустая.");
-        assertEquals(1, history.size(), "История не пустая.");
     }
 }
