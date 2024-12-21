@@ -41,7 +41,7 @@ class SubTaskTest {
     }
 
     @Test
-    public void shouldBeEqualsIfIdsEquals() {
+    void shouldBeEqualsIfIdsEquals() {
         SubTask subTaskToCompare = new SubTask(0, "Помыть собаку", "Загрузить машинку",
                 TaskStatus.IN_PROGRESS, 1);
         Assertions.assertNotEquals(subTask, subTaskToCompare,
