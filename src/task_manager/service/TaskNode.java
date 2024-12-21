@@ -1,11 +1,11 @@
 package task_manager.service;
 
-public class TaskNode<Task> {
-    public Task data;
-    public TaskNode<Task> next;
-    public TaskNode<Task> prev;
+public class TaskNode<T> {
+    public T data;
+    public TaskNode<T> next;
+    public TaskNode<T> prev;
 
-    public TaskNode(Task task) {
+    public TaskNode(T task) {
         this.data = task;
         this.prev = null;
         this.next = null;
