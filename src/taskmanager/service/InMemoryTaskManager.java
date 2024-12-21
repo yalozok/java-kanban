@@ -1,6 +1,6 @@
-package taskManager.service;
+package taskmanager.service;
 
-import taskManager.model.*;
+import taskmanager.model.*;
 
 import java.util.Map;
 import java.util.HashMap;

@@ -1,4 +1,4 @@
-package taskManager.service;
+package taskmanager.service;
 
 public class Main {
 

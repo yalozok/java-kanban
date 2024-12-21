@@ -1,6 +1,6 @@
-import taskManager.model.*;
-import taskManager.service.*;
-import taskManager.model.TaskStatus;
+import taskmanager.model.*;
+import taskmanager.service.*;
+import taskmanager.model.TaskStatus;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

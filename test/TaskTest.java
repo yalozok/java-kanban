@@ -1,9 +1,9 @@
-import taskManager.model.Task;
-import taskManager.model.TaskStatus;
+import taskmanager.model.Task;
+import taskmanager.model.TaskStatus;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import taskManager.model.TaskType;
+import taskmanager.model.TaskType;
 
 class TaskTest {
     private static Task task;
