@@ -1,4 +1,4 @@
-package task_manager.model;
+package taskManager.model;
 
 public class SubTask extends Task {
     private Integer epicId;

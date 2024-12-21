@@ -1,5 +1,5 @@
-import task_manager.model.Epic;
-import task_manager.model.TaskType;
+import taskManager.model.Epic;
+import taskManager.model.TaskType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -1,4 +1,4 @@
-package task_manager.model;
+package taskManager.model;
 
 public enum TaskType {
     REGULAR,

@@ -1,11 +1,11 @@
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import task_manager.model.Epic;
-import task_manager.model.SubTask;
-import task_manager.model.Task;
-import task_manager.model.TaskStatus;
-import task_manager.service.Manager;
-import task_manager.service.TaskManager;
+import taskManager.model.Epic;
+import taskManager.model.SubTask;
+import taskManager.model.Task;
+import taskManager.model.TaskStatus;
+import taskManager.service.Manager;
+import taskManager.service.TaskManager;
 
 import java.util.List;
 

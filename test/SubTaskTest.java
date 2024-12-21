@@ -1,6 +1,6 @@
-import task_manager.model.SubTask;
-import task_manager.model.TaskType;
-import task_manager.model.TaskStatus;
+import taskManager.model.SubTask;
+import taskManager.model.TaskType;
+import taskManager.model.TaskStatus;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
