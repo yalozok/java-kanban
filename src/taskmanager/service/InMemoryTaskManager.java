@@ -56,9 +56,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     private <T extends Task> List<T> createTaskList(Map<Integer, T> collection) {
-        List<T> list = new ArrayList<>();
-        list.addAll(collection.values());
-        return list;
+        return new ArrayList<>(collection.values());
     }
 
     @Override
