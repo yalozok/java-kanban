@@ -1,6 +1,7 @@
-package task_manager.service;
+package taskmanager.service;
 
-import task_manager.model.*;
+import taskmanager.model.*;
+
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
@@ -55,11 +56,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     private <T extends Task> List<T> createTaskList(Map<Integer, T> collection) {
-        List<T> list = new ArrayList<>();
-        for (Integer id : collection.keySet()) {
-            list.add(collection.get(id));
-        }
-        return list;
+        return new ArrayList<>(collection.values());
     }
 
     @Override
@@ -73,6 +70,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void deleteTaskById(Integer id) {
         if (hasTask(id)) {
             tasks.remove(id);
+            historyManager.remove(id);
         }
     }
 
@@ -81,7 +79,9 @@ public class InMemoryTaskManager implements TaskManager {
         if (tasks.isEmpty()) {
             return;
         }
-        tasks.clear();
+        for (Integer id : tasks.keySet()) {
+            deleteTaskById(id);
+        }
     }
 
     //    EPIC
@@ -164,8 +164,10 @@ public class InMemoryTaskManager implements TaskManager {
         if (!listSubTaskId.isEmpty()) {
             for (Integer subTaskId : listSubTaskId) {
                 subTasks.remove(subTaskId);
+                historyManager.remove(subTaskId);
             }
         }
+        historyManager.remove(id);
         epics.remove(id);
     }
 
@@ -247,6 +249,7 @@ public class InMemoryTaskManager implements TaskManager {
         Integer epicId = subTasks.get(id).getEpicId();
         deleteSubTaskIdFromEpic(id, epicId);
         updateEpicStatus(epicId);
+        historyManager.remove(id);
         subTasks.remove(id);
     }
 

@@ -1,5 +1,5 @@
-import task_manager.model.Epic;
-import task_manager.model.TaskType;
+import taskmanager.model.Epic;
+import taskmanager.model.TaskType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,7 +39,7 @@ class EpicTest {
     }
 
     @Test
-    public void shouldBeEqualsIfIdsEquals() {
+    void shouldBeEqualsIfIdsEquals() {
         Epic epicToCompare = new Epic(0, "Помыть собаку", "Загрузить машинку", subtaskIds);
         Assertions.assertNotEquals(epic, epicToCompare, "Epic с одинаковым id должны быть равны");
     }

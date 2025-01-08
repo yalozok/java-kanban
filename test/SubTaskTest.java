@@ -1,6 +1,6 @@
-import task_manager.model.SubTask;
-import task_manager.model.TaskType;
-import task_manager.model.TaskStatus;
+import taskmanager.model.SubTask;
+import taskmanager.model.TaskType;
+import taskmanager.model.TaskStatus;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -41,7 +41,7 @@ class SubTaskTest {
     }
 
     @Test
-    public void shouldBeEqualsIfIdsEquals() {
+    void shouldBeEqualsIfIdsEquals() {
         SubTask subTaskToCompare = new SubTask(0, "Помыть собаку", "Загрузить машинку",
                 TaskStatus.IN_PROGRESS, 1);
         Assertions.assertNotEquals(subTask, subTaskToCompare,
