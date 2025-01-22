@@ -3,9 +3,9 @@ package taskmanager.service;
 import taskmanager.model.*;
 
 import java.io.*;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
     private final File file;
@@ -19,10 +19,9 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
         try (BufferedReader buffer = new BufferedReader(new FileReader(file.getAbsolutePath()))) {
             String headers = buffer.readLine();
-
             while (buffer.ready()) {
                 String taskString = buffer.readLine();
-                fileBackedManager.addTaskFromString(taskString, headers);
+                fileBackedManager.addTaskFromString(taskString);
             }
 
             return fileBackedManager;
@@ -43,10 +42,14 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     private void writeTasksToFile(List<Task> tasks) throws ManagerSaveException {
         try (Writer fileWriter = new FileWriter(file.getAbsolutePath())) {
-            Set<String> headers = createFileHeader(tasks);
-            fileWriter.write(String.join(",", headers) + "\n");
+
+            String headers = Arrays.stream(Header.values())
+                    .map(header -> header.name().toLowerCase())
+                    .collect(Collectors.joining(","));
+            fileWriter.write(headers + "\n");
+
             for (Task task : tasks) {
-                fileWriter.write(taskToString(task, headers));
+                fileWriter.write(taskToString(task));
                 fileWriter.write("\n");
             }
         } catch (IOException e) {
@@ -54,35 +57,14 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         }
     }
 
-    private Set<String> createFileHeader(List<Task> tasks) {
-        Set<String> headers = new LinkedHashSet<>();
-        for (Task task : tasks) {
-            Class<?> className = task.getClass();
-            while (className != null) {
-                Set<String> partFields = new LinkedHashSet<>();
-                for (Field field : className.getDeclaredFields()) {
-                    partFields.add(field.getName());
-                }
-                partFields.addAll(headers);
-                headers = partFields;
-                className = className.getSuperclass();
-            }
-        }
-        return headers;
-    }
-
-    private String taskToString(Task task, Set<String> headers) {
+    private String taskToString(Task task) {
         StringBuilder taskBuilder = new StringBuilder();
         Class<?> taskClass = task.getClass();
 
-        for (String header : headers) {
-            String methodName = "get" + header.substring(0, 1).toUpperCase() + header.substring(1);
-            if (methodName.equals("getSubTaskIds")) {
-                methodName = "getFormattedSubTaskIds";
-            }
-            if (hasMethod(taskClass, methodName)) {
+        for (Header header : Header.values()) {
+            if (hasMethod(taskClass, header.methodName)) {
                 try {
-                    Method getter = taskClass.getMethod(methodName);
+                    Method getter = taskClass.getMethod(header.methodName);
                     taskBuilder.append(getter.invoke(task));
                 } catch (Exception e) {
                     String detail = "Problem while taskToString with" + task;
@@ -95,23 +77,22 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         return taskToString.substring(0, taskToString.length() - 1);
     }
 
-    private void addTaskFromString(String taskString, String headersString) {
-        Map<String, String> taskMap = taskStringToMap(taskString, headersString);
-        Integer id = Integer.parseInt(taskMap.get("id"));
-        String name = taskMap.get("name");
-        String description = taskMap.get("description");
-        TaskStatus status = TaskStatus.valueOf(taskMap.get("status"));
+    private void addTaskFromString(String taskString) {
+        Map<Header, String> taskMap = taskStringToMap(taskString);
+        Integer id = Integer.parseInt(taskMap.get(Header.ID));
+        String name = taskMap.get(Header.NAME);
+        String description = taskMap.get(Header.DESCRIPTION);
+        TaskStatus status = TaskStatus.valueOf(taskMap.get(Header.STATUS));
 
-
-        switch (taskMap.get("type")) {
+        switch (taskMap.get(Header.TYPE)) {
             case "EPIC":
-                List<Integer> subTaskIds = stringToArray(taskMap.get("subTaskIds"));
+                List<Integer> subTaskIds = stringToArray(taskMap.get(Header.SUBTASK_IDS));
                 Epic epic = new Epic(id, name, description, subTaskIds);
                 epic.setStatus(status);
                 super.addEpicFromFile(id, epic);
                 break;
             case "SUB_TASK":
-                Integer epicId = Integer.parseInt(taskMap.get("epicId"));
+                Integer epicId = Integer.parseInt(taskMap.get(Header.EPIC_ID));
                 SubTask subTask = new SubTask(id, name, description, status, epicId);
                 super.addSubTaskFromFile(id, subTask);
                 break;
@@ -121,19 +102,21 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         }
     }
 
-    private Map<String, String> taskStringToMap(String taskString, String headersString) {
-        Map<String, String> taskMap = new HashMap<>();
+    private Map<Header, String> taskStringToMap(String taskString) {
+        Map<Header, String> taskMap = new HashMap<>();
         String[] taskFields = taskString.split(",", -1);
-        String[] headers = headersString.split(",", -1);
 
-        for (int i = 0; i < headers.length; i++) {
-            taskMap.put(headers[i], taskFields[i]);
+        for (int i = 0; i < Header.values().length; i++) {
+            taskMap.put(Header.values()[i], taskFields[i]);
         }
         return taskMap;
     }
 
     private List<Integer> stringToArray(String arrayString) {
         List<Integer> arr = new ArrayList<>();
+        if (arrayString.isBlank()) {
+            return arr;
+        }
         String[] stringIntegers = arrayString.split("&");
 
         for (String s : stringIntegers) {
