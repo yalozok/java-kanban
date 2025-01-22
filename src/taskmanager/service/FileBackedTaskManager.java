@@ -4,6 +4,8 @@ import taskmanager.model.*;
 
 import java.io.*;
 import java.lang.reflect.Method;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -103,7 +105,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     private Map<Header, String> taskStringToMap(String taskString) {
-        Map<Header, String> taskMap = new HashMap<>();
+        Map<Header, String> taskMap = new EnumMap<>(Header.class);
         String[] taskFields = taskString.split(",", -1);
 
         for (int i = 0; i < Header.values().length; i++) {
@@ -207,5 +209,37 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     public void deleteAllSubTasks() {
         super.deleteAllSubTasks();
         save();
+    }
+
+    public static void main(String[] args) {
+        Task task1 = new Task("task1", "description task1");
+        Task task2 = new Task("task2", "description task2");
+        Epic epic1 = new Epic("epic1", "description epic1");
+        Epic epic2 = new Epic("epic2", "description epic2");
+        SubTask subTask1 = new SubTask("subtask1", "description subtask1");
+        SubTask subTask2 = new SubTask("subtask2", "description subtask2");
+        SubTask subTask3 = new SubTask("subtask3", "description subtask3");
+
+        FileBackedTaskManager manager;
+        Path tempFile;
+        try {
+            tempFile = Files.createTempFile("tempTask", ".csv");
+            manager = loadFromFile(tempFile.toFile());
+        } catch (Exception e) {
+            throw new ManagerSaveException("Problem while main", e);
+        }
+
+        manager.addTask(task1);
+        manager.addTask(task2);
+        Integer epicIdA = manager.addEpic(epic1);
+        Integer epicIdB = manager.addEpic(epic2);
+        manager.addSubTask(subTask1, epicIdA);
+        manager.addSubTask(subTask2, epicIdA);
+        manager.addSubTask(subTask3, epicIdB);
+
+        FileBackedTaskManager manager2 = loadFromFile(tempFile.toFile());
+        System.out.println(manager2.getAllTasks());
+        System.out.println(manager2.getAllEpics());
+        System.out.println(manager2.getAllSubTasks());
     }
 }
