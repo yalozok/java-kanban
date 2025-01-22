@@ -1,3 +1,4 @@
+import org.junit.jupiter.api.BeforeEach;
 import taskmanager.model.*;
 import taskmanager.service.*;
 import taskmanager.model.TaskStatus;
@@ -7,7 +8,12 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 class InMemoryTaskManagerTest {
-    TaskManager manager = new Manager().getDefault();
+    TaskManager manager;
+
+    @BeforeEach
+    void createManager() {
+        manager = new Manager().getDefault();
+    }
 
     @Test
     void addTask() {
