@@ -34,6 +34,10 @@ public class InMemoryTaskManager implements TaskManager {
         return id;
     }
 
+    protected void addTaskFromFile(Integer id, Task task) {
+        tasks.put(id, task);
+    }
+
     private boolean hasTask(Integer id) {
         return tasks.containsKey(id);
     }
@@ -93,6 +97,10 @@ public class InMemoryTaskManager implements TaskManager {
         epics.put(id, epic);
         updateId();
         return id;
+    }
+
+    protected void addEpicFromFile(Integer id, Epic epic) {
+        epics.put(id, epic);
     }
 
     private boolean hasEpic(Integer id) {
@@ -197,6 +205,10 @@ public class InMemoryTaskManager implements TaskManager {
         updateEpicStatus(epicId);
         updateId();
         return id;
+    }
+
+    protected void addSubTaskFromFile(Integer id, SubTask subTask) {
+        subTasks.put(id, subTask);
     }
 
     private boolean hasSubTask(Integer id) {
