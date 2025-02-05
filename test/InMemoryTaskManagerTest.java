@@ -17,7 +17,7 @@ class InMemoryTaskManagerTest {
 
     @Test
     void addTask() {
-        Task task = new Task("Помыть посуду", "Загрузить машинку");
+        Task task = new Task.Builder<>("Помыть посуду", "Загрузить машинку").build();
         Integer id = manager.addTask(task);
 
         Task taskSaved = manager.getTaskById(id);
@@ -33,10 +33,10 @@ class InMemoryTaskManagerTest {
 
     @Test
     void updateTask() {
-        Task task = new Task("Помыть посуду", "Загрузить машинку");
+        Task task = new Task.Builder<>("Помыть посуду", "Загрузить машинку").build();
         Integer id = manager.addTask(task);
 
-        manager.updateTask(new Task(id, "Помыть посуду", "Загрузить машинку", TaskStatus.DONE));
+        manager.updateTask(new Task.Builder<>("Помыть посуду", "Загрузить машинку").id(id).status(TaskStatus.DONE).build());
         Task taskUpdated = manager.getTaskById(id);
         Assertions.assertEquals(1, manager.getAllTasks().size(), "Неверное количество задач");
         Assertions.assertNotEquals(task, taskUpdated, "Задача не обновилась");
@@ -44,8 +44,8 @@ class InMemoryTaskManagerTest {
 
     @Test
     void deleteTask() {
-        Integer id1 = manager.addTask(new Task("Помыть посуду", "Загрузить машинку"));
-        Integer id2 = manager.addTask(new Task("Помыть собаку", "С шампунем"));
+        Integer id1 = manager.addTask(new Task.Builder<>("Помыть посуду", "Загрузить машинку").build());
+        Integer id2 = manager.addTask(new Task.Builder<>("Помыть собаку", "С шампунем").build());
 
         manager.deleteTaskById(id1);
         List<Task> tasks = manager.getAllTasks();
@@ -59,11 +59,11 @@ class InMemoryTaskManagerTest {
 
     @Test
     void addEpic() {
-        Epic epic = new Epic("Выучить язык", "Английский");
+        Epic epic = new Epic.Builder("Выучить язык", "Английский").build();
 
         Integer id = manager.addEpic(epic);
         Epic epicSaved = manager.getEpicById(id);
-        Assertions.assertNotNull(epicSaved, "task_manager.model.Epic не добавлен");
+        Assertions.assertNotNull(epicSaved, "Epic не добавлен");
         Assertions.assertEquals(epic, epicSaved, "Epics не совпадают");
 
         List<Epic> epics = manager.getAllEpics();
@@ -74,16 +74,16 @@ class InMemoryTaskManagerTest {
 
     @Test
     void addEpicWithSubTasks() {
-        Integer id = manager.addEpic(new Epic("Выучить язык", "Английский"));
-        SubTask subTask1 = new SubTask("Записаться на курсы", "Хорошие");
-        SubTask subTask2 = new SubTask("Купить книги", "Недорогие");
+        Integer id = manager.addEpic(new Epic.Builder("Выучить язык", "Английский").build());
+        SubTask subTask1 = new SubTask.Builder("Записаться на курсы", "Хорошие", id).build();
+        SubTask subTask2 = new SubTask.Builder("Купить книги", "Недорогие", id).build();
 
         Epic epicSaved = manager.getEpicById(id);
-        manager.addSubTask(subTask1, id);
-        manager.addSubTask(subTask2, id);
+        manager.addSubTask(subTask1);
+        manager.addSubTask(subTask2);
         List<Integer> subTaskIds = epicSaved.getSubTaskIds();
 
-        Assertions.assertNotNull(subTaskIds, "task_manager.model.SubTask ids не возвращаются");
+        Assertions.assertNotNull(subTaskIds, "SubTask ids не возвращаются");
         Assertions.assertEquals(2, subTaskIds.size(), "Количество subtasks не совпадает");
         Assertions.assertEquals(subTask1, manager.getSubTaskById(subTaskIds.getFirst()),
                 "SubTasks не совпадают");
@@ -91,10 +91,10 @@ class InMemoryTaskManagerTest {
 
     @Test
     void updateEpic() {
-        Epic epic = new Epic("Помыть посуду", "Загрузить машинку");
+        Epic epic = new Epic.Builder("Помыть посуду", "Загрузить машинку").build();
         Integer id = manager.addEpic(epic);
 
-        manager.updateEpic(new Epic(id, "Помыть собаку", "Загрузить машинку"));
+        manager.updateEpic(new Epic.Builder("Помыть собаку", "Загрузить машинку").id(id).build());
         Epic epicUpdated = manager.getEpicById(id);
         Assertions.assertEquals(1, manager.getAllEpics().size(), "Неверное количество epics");
         Assertions.assertNotEquals(epic, epicUpdated, "task_manager.model.Epic не обновился");
@@ -102,11 +102,11 @@ class InMemoryTaskManagerTest {
 
     @Test
     void deleteEpicById() {
-        Integer epicId = manager.addEpic(new Epic("Выучить язык", "Английский"));
-        SubTask subTask1 = new SubTask("Записаться на курсы", "Хорошие");
-        SubTask subTask2 = new SubTask("Купить книги", "Недорогие");
-        manager.addSubTask(subTask1, epicId);
-        manager.addSubTask(subTask2, epicId);
+        Integer epicId = manager.addEpic(new Epic.Builder("Выучить язык", "Английский").build());
+        SubTask subTask1 = new SubTask.Builder("Записаться на курсы", "Хорошие", epicId).build();
+        SubTask subTask2 = new SubTask.Builder("Купить книги", "Недорогие", epicId).build();
+        manager.addSubTask(subTask1);
+        manager.addSubTask(subTask2);
 
         List<Epic> epics = manager.getAllEpics();
         List<SubTask> subtasks = manager.getAllSubTasks();
@@ -123,9 +123,9 @@ class InMemoryTaskManagerTest {
 
     @Test
     void addSubTask() {
-        Integer epicId = manager.addEpic(new Epic("Выучить язык", "Английский"));
-        SubTask subTask = new SubTask("Записаться на курсы", "Хорошие");
-        Integer subTaskId = manager.addSubTask(subTask, epicId);
+        Integer epicId = manager.addEpic(new Epic.Builder("Выучить язык", "Английский").build());
+        SubTask subTask = new SubTask.Builder("Записаться на курсы", "Хорошие", epicId).build();
+        Integer subTaskId = manager.addSubTask(subTask);
 
         List<SubTask> subTasks = manager.getAllSubTasks();
         Assertions.assertNotNull(subTasks, "task_manager.model.SubTask ids не возвращаются");
@@ -136,24 +136,22 @@ class InMemoryTaskManagerTest {
 
     @Test
     void shouldNotCreateSubtaskWithEpicIdAsSubTaskId() {
-        Integer epicId = manager.addEpic(new Epic("Выучить язык", "Английский"));
-        SubTask subTask = new SubTask("Записаться на курсы", "Хорошие");
-        subTask.setId(epicId);
-        subTask.setEpicId(epicId);
+        Integer epicId = manager.addEpic(new Epic.Builder("Выучить язык", "Английский").build());
+        SubTask subTask = new SubTask.Builder("Записаться на курсы", "Хорошие", epicId).id(epicId).build();
 
-        Integer subTaskId = manager.addSubTask(subTask, epicId);
+        Integer subTaskId = manager.addSubTask(subTask);
         Assertions.assertNotEquals(subTaskId, manager.getSubTaskById(subTaskId).getEpicId(),
                 "task_manager.model.SubTask id и epic id совпадают");
     }
 
     @Test
     void updateSubTask() {
-        Integer epicId = manager.addEpic(new Epic("Выучить язык", "Английский"));
+        Integer epicId = manager.addEpic(new Epic.Builder("Выучить язык", "Английский").build());
         TaskStatus epicSavedStatus = manager.getEpicById(epicId).getStatus();
-        SubTask subTask = new SubTask("Записаться на курсы", "Хорошие");
-        Integer subtaskId = manager.addSubTask(subTask, epicId);
-        SubTask subTaskToUpdate = new SubTask(subtaskId, "Купить книги", subTask.getDescription(),
-                TaskStatus.IN_PROGRESS, epicId);
+        SubTask subTask = new SubTask.Builder("Записаться на курсы", "Хорошие", epicId).build();
+        Integer subtaskId = manager.addSubTask(subTask);
+        SubTask subTaskToUpdate = new SubTask.Builder("Купить книги", subTask.getDescription(), epicId)
+                .id(subtaskId).status(TaskStatus.IN_PROGRESS).build();
 
         manager.updateSubTask(subTaskToUpdate);
 
@@ -167,9 +165,9 @@ class InMemoryTaskManagerTest {
 
     @Test
     void deleteSubTaskById() {
-        Integer epicId = manager.addEpic(new Epic("Выучить язык", "Английский"));
-        SubTask subTask1 = new SubTask("Записаться на курсы", "Хорошие");
-        Integer subtaskId = manager.addSubTask(subTask1, epicId);
+        Integer epicId = manager.addEpic(new Epic.Builder("Выучить язык", "Английский").build());
+        SubTask subTask1 = new SubTask.Builder("Записаться на курсы", "Хорошие", epicId).build();
+        Integer subtaskId = manager.addSubTask(subTask1);
 
         manager.deleteSubTaskById(subtaskId);
         List<SubTask> subtasks = manager.getAllSubTasks();

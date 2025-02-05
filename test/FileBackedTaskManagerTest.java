@@ -45,7 +45,7 @@ class FileBackedTaskManagerTest extends InMemoryTaskManagerTest {
 
     @Test
     void loadTaskFromFile() {
-        Task task = new Task("task1", "description task1");
+        Task task = new Task.Builder<>("task1", "description task1").build();
         manager.addTask(task);
         FileBackedTaskManager managerLoaded = FileBackedTaskManager.loadFromFile(tempFile.toFile());
 
