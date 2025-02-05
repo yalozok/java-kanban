@@ -9,20 +9,43 @@ public class Task {
     protected TaskStatus status;
     protected final TaskType type;
 
-    protected Task(String name, String description, TaskType type) {
-        this.name = name;
-        this.description = description;
-        this.type = type;
+    protected Task(Builder<?> builder) {
+        this.id = builder.id;
+        this.name = builder.name;
+        this.description = builder.description;
+        this.status = builder.status;
+        this.type = builder.type;
     }
 
-    public Task(String name, String description) {
-        this(name, description, TaskType.REGULAR);
-    }
+    public static class Builder<T extends Builder<T>> {
+        private Integer id;
+        private String name;
+        private String description;
+        private TaskStatus status;
+        protected TaskType type = TaskType.REGULAR;
 
-    public Task(Integer id, String name, String description, TaskStatus status) {
-        this(name, description, TaskType.REGULAR);
-        this.id = id;
-        this.status = status;
+        public Builder(String name, String description) {
+            this.name = name;
+            this.description = description;
+        }
+
+        public T id(Integer id) {
+            this.id = id;
+            return self();
+        }
+
+        public T status(TaskStatus status) {
+            this.status = status;
+            return self();
+        }
+
+        protected T self() {
+            return (T) this;
+        }
+
+        public Task build() {
+            return new Task(this);
+        }
     }
 
     public TaskType getType() {

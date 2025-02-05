@@ -10,7 +10,7 @@ class TaskTest {
 
     @BeforeEach
     public void beforeEach() {
-        task = new Task(0, "Помыть посуду", "Загрузить машинку", TaskStatus.IN_PROGRESS);
+        task = new Task.Builder<>("Помыть посуду", "Загрузить машинку").id(0).status(TaskStatus.IN_PROGRESS).build();
     }
 
     @Test
@@ -51,7 +51,7 @@ class TaskTest {
 
     @Test
     void shouldBeEqualsIfIdsEquals() {
-        Task taskToCompare = new Task(0, "Помыть собаку", "Загрузить машинку", TaskStatus.IN_PROGRESS);
+        Task taskToCompare = new Task.Builder<>("Помыть собаку", "Загрузить машинку").id(0).status(TaskStatus.IN_PROGRESS).build();
         Assertions.assertNotEquals(task, taskToCompare,
                 "Task с одинаковым id должны быть равны");
     }
