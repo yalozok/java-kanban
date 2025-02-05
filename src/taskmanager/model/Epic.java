@@ -5,21 +5,35 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Epic extends Task {
-    private List<Integer> subTaskIds = new ArrayList<>();
+    private List<Integer> subTaskIds;
 
-    public Epic(String name, String description) {
-        super(name, description, TaskType.EPIC);
+    private Epic(Builder builder) {
+        super(builder);
+        this.subTaskIds = builder.subTaskIds;
     }
 
-    public Epic(Integer id, String name, String description) {
-        super(name, description, TaskType.EPIC);
-        this.id = id;
-    }
+    public static class Builder extends Task.Builder<Builder> {
+        private List<Integer> subTaskIds = new ArrayList<>();
 
-    public Epic(Integer id, String name, String description, List<Integer> subTaskIds) {
-        super(name, description, TaskType.EPIC);
-        this.id = id;
-        this.subTaskIds = subTaskIds;
+        public Builder(String name, String description) {
+            super(name, description);
+            this.type = TaskType.EPIC;
+        }
+
+        public Builder subTaskIds(List<Integer> subTaskIds) {
+            this.subTaskIds = subTaskIds;
+            return self();
+        }
+
+        @Override
+        protected Builder self() {
+            return this;
+        }
+
+        @Override
+        public Epic build() {
+            return new Epic(this);
+        }
     }
 
     public List<Integer> getSubTaskIds() {

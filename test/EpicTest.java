@@ -15,7 +15,7 @@ class EpicTest {
     public void beforeEach() {
         subtaskIds.add(1);
         subtaskIds.add(2);
-        epic = new Epic(0, "Помыть посуду", "Загрузить машинку", subtaskIds);
+        epic = new Epic.Builder("Помыть посуду", "Загрузить машинку").id(0).subTaskIds(subtaskIds).build();
     }
 
     @Test
@@ -40,7 +40,7 @@ class EpicTest {
 
     @Test
     void shouldBeEqualsIfIdsEquals() {
-        Epic epicToCompare = new Epic(0, "Помыть собаку", "Загрузить машинку", subtaskIds);
+        Epic epicToCompare = new Epic.Builder( "Помыть собаку", "Загрузить машинку").id(0).subTaskIds(subtaskIds).build();
         Assertions.assertNotEquals(epic, epicToCompare, "Epic с одинаковым id должны быть равны");
     }
 }
