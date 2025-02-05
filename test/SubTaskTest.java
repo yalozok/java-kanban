@@ -11,21 +11,13 @@ class SubTaskTest {
 
     @BeforeEach
     public void beforeEach() {
-        subTask = new SubTask(0, "Помыть посуду", "Загрузить машинку",
-                TaskStatus.IN_PROGRESS, 1);
+        subTask = new SubTask.Builder( "Помыть посуду", "Загрузить машинку", 1).id(0).status(TaskStatus.IN_PROGRESS).build();
     }
 
     @Test
     void shouldReturnSubTaskType() {
         Assertions.assertEquals(TaskType.SUB_TASK, subTask.getType(),
                 "SubTask получает неверный type");
-    }
-
-    @Test
-    void setEpicId() {
-        subTask.setEpicId(2);
-        Assertions.assertEquals(2, subTask.getEpicId(),
-                "SubTask получает неверный epic id");
     }
 
     @Test
@@ -42,8 +34,7 @@ class SubTaskTest {
 
     @Test
     void shouldBeEqualsIfIdsEquals() {
-        SubTask subTaskToCompare = new SubTask(0, "Помыть собаку", "Загрузить машинку",
-                TaskStatus.IN_PROGRESS, 1);
+        SubTask subTaskToCompare = new SubTask.Builder("Помыть собаку", "Загрузить машинку", 1).id(0).status(TaskStatus.IN_PROGRESS).build();
         Assertions.assertNotEquals(subTask, subTaskToCompare,
                 "SubTask с одинаковым id должны быть равны");
     }

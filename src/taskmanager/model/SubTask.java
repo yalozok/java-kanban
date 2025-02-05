@@ -3,19 +3,29 @@ package taskmanager.model;
 public class SubTask extends Task {
     private Integer epicId;
 
-    public SubTask(String name, String description) {
-        super(name, description, TaskType.SUB_TASK);
+    private SubTask(Builder builder) {
+        super(builder);
+        this.epicId = builder.epicId;
     }
 
-    public SubTask(Integer id, String name, String description, TaskStatus status, Integer epicId) {
-        super(name, description, TaskType.SUB_TASK);
-        this.id = id;
-        this.status = status;
-        this.epicId = epicId;
-    }
+    public static class Builder extends Task.Builder<Builder> {
+        private Integer epicId;
 
-    public void setEpicId(Integer epicId) {
-        this.epicId = epicId;
+        public Builder (String name, String description, Integer epicId) {
+            super(name, description);
+            this.epicId = epicId;
+            this.type = TaskType.SUB_TASK;
+        }
+
+        @Override
+        protected Builder self() {
+            return this;
+        }
+
+        @Override
+        public SubTask build() {
+            return new SubTask(this);
+        }
     }
 
     public Integer getEpicId() {

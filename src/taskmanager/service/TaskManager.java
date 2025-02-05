@@ -31,7 +31,7 @@ public interface TaskManager {
 
     void deleteAllEpics();
 
-    Integer addSubTask(SubTask subTask, Integer epicId);
+    Integer addSubTask(SubTask subTask);
 
     SubTask getSubTaskById(Integer id);
 
