@@ -11,7 +11,7 @@ class SubTaskTest {
 
     @BeforeEach
     public void beforeEach() {
-        subTask = new SubTask.Builder( "Помыть посуду", "Загрузить машинку", 1).id(0).status(TaskStatus.IN_PROGRESS).build();
+        subTask = new SubTask.Builder("Помыть посуду", "Загрузить машинку", 1).id(0).status(TaskStatus.IN_PROGRESS).build();
     }
 
     @Test

@@ -11,7 +11,7 @@ public class SubTask extends Task {
     public static class Builder extends Task.Builder<Builder> {
         private Integer epicId;
 
-        public Builder (String name, String description, Integer epicId) {
+        public Builder(String name, String description, Integer epicId) {
             super(name, description);
             this.epicId = epicId;
             this.type = TaskType.SUB_TASK;
