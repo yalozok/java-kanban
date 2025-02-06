@@ -81,11 +81,11 @@ class InMemoryTaskManagerTest {
         Epic epicSaved = manager.getEpicById(id);
         manager.addSubTask(subTask1);
         manager.addSubTask(subTask2);
-        List<Integer> subTaskIds = epicSaved.getSubTaskIds();
+        List<SubTask> subTasks = epicSaved.getSubTasks();
 
-        Assertions.assertNotNull(subTaskIds, "SubTask ids не возвращаются");
-        Assertions.assertEquals(2, subTaskIds.size(), "Количество subtasks не совпадает");
-        Assertions.assertEquals(subTask1, manager.getSubTaskById(subTaskIds.getFirst()),
+        Assertions.assertNotNull(subTasks, "SubTask ids не возвращаются");
+        Assertions.assertEquals(2, subTasks.size(), "Количество subtasks не совпадает");
+        Assertions.assertEquals(subTask1, manager.getSubTaskById(subTasks.getFirst().getId()),
                 "SubTasks не совпадают");
     }
 
@@ -130,7 +130,7 @@ class InMemoryTaskManagerTest {
         List<SubTask> subTasks = manager.getAllSubTasks();
         Assertions.assertNotNull(subTasks, "task_manager.model.SubTask ids не возвращаются");
         Assertions.assertEquals(subTask, subTasks.getFirst(), "SubTasks не совпадают");
-        Assertions.assertEquals(subTaskId, manager.getEpicById(epicId).getSubTaskIds().getFirst(),
+        Assertions.assertEquals(subTaskId, manager.getEpicById(epicId).getSubTasks().getFirst().getId(),
                 "task_manager.model.SubTask id не закреплено за epic");
     }
 
@@ -172,7 +172,7 @@ class InMemoryTaskManagerTest {
         manager.deleteSubTaskById(subtaskId);
         List<SubTask> subtasks = manager.getAllSubTasks();
         Assertions.assertEquals(0, subtasks.size(), "Неверное количество subtasks");
-        Assertions.assertEquals(0, manager.getEpicById(epicId).getSubTaskIds().size(),
+        Assertions.assertEquals(0, manager.getEpicById(epicId).getSubTasks().size(),
                 "Неверное количество subtasks в epic");
     }
 }

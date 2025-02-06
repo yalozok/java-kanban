@@ -35,8 +35,6 @@ public interface TaskManager {
 
     SubTask getSubTaskById(Integer id);
 
-    List<SubTask> getAllSubTasksByEpic(Integer epicId);
-
     List<SubTask> getAllSubTasks();
 
     void updateSubTask(SubTask subTask);
