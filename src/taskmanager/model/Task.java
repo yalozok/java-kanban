@@ -3,10 +3,11 @@ package taskmanager.model;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.Objects;
 import java.util.Optional;
 
-public class Task {
+public class Task implements Comparable<Task> {
     protected Integer id;
     protected String name;
     protected String description;
@@ -101,7 +102,9 @@ public class Task {
         this.status = status;
     }
 
-    public static DateTimeFormatter getFormatter() {return formatter;}
+    public static DateTimeFormatter getFormatter() {
+        return formatter;
+    }
 
     public Optional<LocalDateTime> getStartTime() {
         return Optional.ofNullable(startTime);
@@ -125,7 +128,7 @@ public class Task {
 
     public String formatStartTime() {
         Optional<LocalDateTime> startTimeOptional = getStartTime();
-        if(startTimeOptional.isPresent()) {
+        if (startTimeOptional.isPresent()) {
             LocalDateTime startTimeFormat = startTimeOptional.get();
             return startTimeFormat.format(formatter);
         }
@@ -134,7 +137,7 @@ public class Task {
 
     public String formatEndTime() {
         Optional<LocalDateTime> endTimeOptional = getEndTime();
-        if(endTimeOptional.isPresent()) {
+        if (endTimeOptional.isPresent()) {
             LocalDateTime endTimeFormat = endTimeOptional.get();
             return endTimeFormat.format(formatter);
         }
@@ -148,7 +151,7 @@ public class Task {
 
     @Override
     public String toString() {
-        return  "id=" + id +
+        return "id=" + id +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", status=" + status +
@@ -168,5 +171,19 @@ public class Task {
     @Override
     public int hashCode() {
         return Objects.hash(id, name, description, status, type);
+    }
+
+    @Override
+    public int compareTo(Task otherTask) {
+        if (this.getStartTime().isEmpty() && otherTask.getStartTime().isEmpty()) {
+            return Integer.compare(this.getId(), otherTask.getId());
+        } else if (this.getStartTime().isEmpty()) {
+            return 1;
+        } else if (otherTask.getStartTime().isEmpty()) {
+            return -1;
+        }
+        return Comparator.comparing( (Task task) -> task.getStartTime().get(), Comparator.naturalOrder())
+                .thenComparing(Task::getId)
+                .compare(this, otherTask);
     }
 }
