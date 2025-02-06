@@ -1,5 +1,6 @@
 import taskmanager.model.Epic;
 import taskmanager.model.SubTask;
+import taskmanager.model.TaskStatus;
 import taskmanager.model.TaskType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -52,10 +53,11 @@ class EpicTest {
 
     @Test
     void shouldNotTakeTimeAndDurationForCreation() {
+        Epic.Builder builder = new Epic.Builder("EpicWithData", "DescriptionEpicWithData");
         LocalDateTime startTime = LocalDateTime.now();
         Duration duration = Duration.ofMinutes(10);
         Assertions.assertThrows(UnsupportedOperationException.class,
-                () -> new Epic.Builder("EpicWithData", "DescriptionEpicWithData").schedule(startTime, duration),
+                () -> builder.schedule(startTime, duration),
                 "Epic принимает время и дату в конструкторе.");
     }
 
@@ -93,6 +95,45 @@ class EpicTest {
         Assertions.assertEquals(Optional.of(startTimeSubTask3), epic.getStartTime(), "Старт Epic вычисляется неверно");
         Assertions.assertEquals(Optional.of(durationSubTask3.plus(durationSubTask4)), epic.getDuration(), "Продолжительность Epic вычисляется неверно");
         Assertions.assertEquals(subTask4.getEndTime(), epic.getEndTime(), "Финиш Epic вычисляется неверно");
+    }
+
+    @Test
+    void shouldHasStatusNEWifAllSubtasksNEW() {
+        List<SubTask> listSubTasks = new ArrayList<>();
+        listSubTasks.add(new SubTask.Builder("subTask1", "description subTask1", 2)
+                .status(TaskStatus.NEW).build());
+        listSubTasks.add(new SubTask.Builder("subTask2", "description subTask2", 2)
+                .status(TaskStatus.NEW).build());
+        Epic epicForStatus = new Epic.Builder("epicForStatus", "description epicForStatus")
+                .id(2).subTasks(listSubTasks).build();
+        epicForStatus.updateStatus();
+        Assertions.assertEquals(TaskStatus.NEW, epicForStatus.getStatus(), "Статус вычисляется неверно");
+    }
+
+    @Test
+    void shouldHasStatusDONEifAllSubtasksDONE() {
+        List<SubTask> listSubTasks = new ArrayList<>();
+        listSubTasks.add(new SubTask.Builder("subTask1", "description subTask1", 2)
+                .status(TaskStatus.DONE).build());
+        listSubTasks.add(new SubTask.Builder("subTask2", "description subTask2", 2)
+                .status(TaskStatus.DONE).build());
+        Epic epicForStatus = new Epic.Builder("epicForStatus", "description epicForStatus")
+                .id(2).subTasks(listSubTasks).build();
+        epicForStatus.updateStatus();
+        Assertions.assertEquals(TaskStatus.DONE, epicForStatus.getStatus(), "Статус вычисляется неверно");
+    }
+
+    @Test
+    void shouldHasStatusIN_PROGRESSifAllSubtasksNEWandDONE() {
+        List<SubTask> listSubTasks = new ArrayList<>();
+        listSubTasks.add(new SubTask.Builder("subTask1", "description subTask1", 2)
+                .status(TaskStatus.NEW).build());
+        listSubTasks.add(new SubTask.Builder("subTask2", "description subTask2", 2)
+                .status(TaskStatus.DONE).build());
+        Epic epicForStatus = new Epic.Builder("epicForStatus", "description epicForStatus")
+                .id(2).subTasks(listSubTasks).build();
+        epicForStatus.updateStatus();
+        Assertions.assertEquals(TaskStatus.IN_PROGRESS, epicForStatus.getStatus(), "Статус вычисляется неверно");
     }
 
 }

@@ -62,8 +62,8 @@ public class Epic extends Task {
     }
 
     public void updateSubTask(SubTask updatedSubTask) {
-        for(int i = 0; i < subTasks.size(); i++) {
-            if(subTasks.get(i).getId().equals(updatedSubTask.getId())){
+        for (int i = 0; i < subTasks.size(); i++) {
+            if (subTasks.get(i).getId().equals(updatedSubTask.getId())) {
                 subTasks.set(i, updatedSubTask);
                 break;
             }
@@ -72,7 +72,7 @@ public class Epic extends Task {
     }
 
     public void updateStatus() {
-        if(subTasks.isEmpty()) {
+        if (subTasks.isEmpty()) {
             this.setStatus(TaskStatus.NEW);
         }
 
@@ -80,7 +80,7 @@ public class Epic extends Task {
                 .map(SubTask::getStatus)
                 .collect(Collectors.toSet());
 
-        this.setStatus(uniqueStatuses.size() == 1 ? uniqueStatuses.iterator().next(): TaskStatus.IN_PROGRESS);
+        this.setStatus(uniqueStatuses.size() == 1 ? uniqueStatuses.iterator().next() : TaskStatus.IN_PROGRESS);
     }
 
     @Override
