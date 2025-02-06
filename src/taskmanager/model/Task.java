@@ -182,7 +182,7 @@ public class Task implements Comparable<Task> {
         } else if (otherTask.getStartTime().isEmpty()) {
             return -1;
         }
-        return Comparator.comparing( (Task task) -> task.getStartTime().get(), Comparator.naturalOrder())
+        return Comparator.comparing((Task task) -> task.getStartTime().get(), Comparator.naturalOrder())
                 .thenComparing(Task::getId)
                 .compare(this, otherTask);
     }
