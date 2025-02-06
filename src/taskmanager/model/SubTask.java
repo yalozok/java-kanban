@@ -34,13 +34,7 @@ public class SubTask extends Task {
 
     @Override
     public String toString() {
-        return "task_manager.model.SubTask{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", epicId=" + epicId +
-                ", status=" + status +
-                ", type=" + type +
-                '}';
+        return super.toString() +
+                ", epicId=" + epicId;
     }
 }
