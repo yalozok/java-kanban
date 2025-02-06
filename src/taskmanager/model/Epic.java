@@ -65,7 +65,7 @@ public class Epic extends Task {
         for(int i = 0; i < subTasks.size(); i++) {
             if(subTasks.get(i).getId().equals(updatedSubTask.getId())){
                 subTasks.set(i, updatedSubTask);
-                return;
+                break;
             }
         }
         updateStatus();

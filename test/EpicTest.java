@@ -54,15 +54,17 @@ class EpicTest {
     void shouldNotTakeTimeAndDurationForCreation() {
         LocalDateTime startTime = LocalDateTime.now();
         Duration duration = Duration.ofMinutes(10);
-        Assertions.assertThrows(UnsupportedOperationException.class, new Epic.Builder("EpicWithData", "DescriptionEpicWithData")
-                .schedule(startTime, duration)::build, "Epic принимает время и дату в конструкторе.");
+        Assertions.assertThrows(UnsupportedOperationException.class,
+                () -> new Epic.Builder("EpicWithData", "DescriptionEpicWithData").schedule(startTime, duration),
+                "Epic принимает время и дату в конструкторе.");
     }
 
     @Test
     void shouldNotSetScheduleByItself() {
         LocalDateTime startTime = LocalDateTime.now();
         Duration duration = Duration.ofMinutes(10);
-        Assertions.assertThrows(UnsupportedOperationException.class, () -> epic.setSchedule(startTime, duration), "Epic может установить время, дату и продолжительность через setter");
+        Assertions.assertThrows(UnsupportedOperationException.class,
+                () -> epic.setSchedule(startTime, duration), "Epic может установить время, дату и продолжительность через setter");
     }
 
     @Test
