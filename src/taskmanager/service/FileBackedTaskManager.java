@@ -89,7 +89,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         String name = taskMap.get(Header.NAME);
         String description = taskMap.get(Header.DESCRIPTION);
         TaskStatus status = TaskStatus.valueOf(taskMap.get(Header.STATUS));
-        Optional<LocalDateTime> startTime = Optional.of(LocalDateTime.parse(taskMap.get(Header.START_TIME), Task.getFormatter()));
+        String startTimeStr = taskMap.get(Header.START_TIME);
+        Optional<LocalDateTime> startTime = (startTimeStr == null || startTimeStr.isEmpty()) ? Optional.empty() : Optional.of(LocalDateTime.parse(startTimeStr, Task.getFormatter()));
         Optional<Duration> duration = Optional.of(Duration.ofMinutes(Long.parseLong(taskMap.get(Header.DURATION))));
 
         switch (taskMap.get(Header.TYPE)) {
@@ -101,12 +102,12 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 Integer epicId = Integer.parseInt(taskMap.get(Header.EPIC_ID));
                 SubTask subTask = new SubTask.Builder(name, description, epicId).id(id).status(status).build();
                 startTime.ifPresent(localDateTime -> subTask.setSchedule(localDateTime, duration.get()));
-                super.addSubTaskFromFile(id, subTask);
+                super.addSubTaskFromFile(subTask);
                 break;
             default:
                 Task task = new Task.Builder<>(name, description).id(id).status(status).build();
                 startTime.ifPresent(localDateTime -> task.setSchedule(localDateTime, duration.get()));
-                super.addTaskFromFile(id, task);
+                super.addTaskFromFile(task);
         }
     }
 
@@ -205,8 +206,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     public static void main(String[] args) {
-        Task task1 = new Task.Builder<>("task1", "description task1").schedule(LocalDateTime.now(), Duration.ofMinutes(10)).build();
-        Task task2 = new Task.Builder<>("task2", "description task2").schedule(LocalDateTime.now().plusMinutes(5), Duration.ofMinutes(20)).build();
+        Task task1 = new Task.Builder<>("task1", "description task1").build();
+        Task task2 = new Task.Builder<>("task2", "description task2").schedule(LocalDateTime.now(), Duration.ofMinutes(5)).build();
         Epic epic1 = new Epic.Builder("epic1", "description epic1").build();
         Epic epic2 = new Epic.Builder("epic2", "description epic2").build();
 
@@ -223,9 +224,9 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         manager.addTask(task2);
         Integer epicIdA = manager.addEpic(epic1);
         Integer epicIdB = manager.addEpic(epic2);
-        SubTask subTask1 = new SubTask.Builder("subtask1", "description subtask1", epicIdA).schedule(LocalDateTime.now(), Duration.ofMinutes(5)).build();
-        SubTask subTask2 = new SubTask.Builder("subtask2", "description subtask2", epicIdA).schedule(LocalDateTime.now().plusMinutes(5), Duration.ofMinutes(10)).build();
-        SubTask subTask3 = new SubTask.Builder("subtask3", "description subtask3", epicIdB).schedule(LocalDateTime.now().plusMinutes(5), Duration.ofMinutes(15)).build();
+        SubTask subTask1 = new SubTask.Builder("subtask1", "description subtask1", epicIdA).schedule(LocalDateTime.now().plusMinutes(10), Duration.ofMinutes(5)).build();
+        SubTask subTask2 = new SubTask.Builder("subtask2", "description subtask2", epicIdA).schedule(LocalDateTime.now().plusMinutes(35), Duration.ofMinutes(5)).build();
+        SubTask subTask3 = new SubTask.Builder("subtask3", "description subtask3", epicIdB).schedule(LocalDateTime.now().plusMinutes(55), Duration.ofMinutes(5)).build();
         manager.addSubTask(subTask1);
         manager.addSubTask(subTask2);
         manager.addSubTask(subTask3);
