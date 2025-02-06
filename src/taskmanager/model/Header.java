@@ -7,7 +7,10 @@ public enum Header {
     STATUS("getStatus"),
     TYPE("getType"),
     EPIC_ID("getEpicId"),
-    SUBTASK_IDS("getFormattedSubTaskIds");
+    SUBTASK_IDS("getFormattedSubTaskIds"),
+    START_TIME("formatStartTime"),
+    DURATION("formatDuration"),
+    END_TIME("formatEndTime");
 
     public final String methodName;
 
