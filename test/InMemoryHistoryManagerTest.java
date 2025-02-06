@@ -9,7 +9,7 @@ import taskmanager.service.TaskManager;
 
 import java.util.List;
 
-class InMemoryHistoryManagerTest {
+class InMemoryHistoryManagerTest extends InMemoryTaskManagerTest {
     TaskManager manager = new Manager().getDefault();
 
     @Test
@@ -68,8 +68,8 @@ class InMemoryHistoryManagerTest {
     @Test
     void getHistory_RemoveEpicWithSubtasks_SubTasksRemovedFromHistory() {
         Integer epicId = manager.addEpic(new Epic.Builder("Выучить английский", "Разговорный").build());
-        Integer subtaskId1 = manager.addSubTask(new SubTask.Builder("Записаться на курсы", "Хорошие",epicId).build());
-        Integer subtaskId2 = manager.addSubTask(new SubTask.Builder("Найти репетитора", "С опытом",epicId).build());
+        Integer subtaskId1 = manager.addSubTask(new SubTask.Builder("Записаться на курсы", "Хорошие", epicId).build());
+        Integer subtaskId2 = manager.addSubTask(new SubTask.Builder("Найти репетитора", "С опытом", epicId).build());
 
         manager.getEpicById(epicId);
         manager.getSubTaskById(subtaskId1);
