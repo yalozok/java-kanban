@@ -1,6 +1,10 @@
 package taskmanager.model;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
+import java.util.Optional;
 
 public class Task {
     protected Integer id;
@@ -8,6 +12,9 @@ public class Task {
     protected String description;
     protected TaskStatus status;
     protected final TaskType type;
+    protected Duration duration;
+    protected LocalDateTime startTime;
+    protected static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
 
     protected Task(Builder<?> builder) {
         this.id = builder.id;
@@ -15,6 +22,8 @@ public class Task {
         this.description = builder.description;
         this.status = builder.status;
         this.type = builder.type;
+        this.duration = builder.duration;
+        this.startTime = builder.startTime;
     }
 
     public static class Builder<T extends Builder<T>> {
@@ -23,6 +32,8 @@ public class Task {
         private String description;
         private TaskStatus status;
         protected TaskType type = TaskType.REGULAR;
+        private Duration duration;
+        private LocalDateTime startTime;
 
         public Builder(String name, String description) {
             this.name = name;
@@ -36,6 +47,12 @@ public class Task {
 
         public T status(TaskStatus status) {
             this.status = status;
+            return self();
+        }
+
+        public T schedule(LocalDateTime startTime, Duration duration) {
+            this.startTime = startTime;
+            this.duration = duration;
             return self();
         }
 
@@ -84,15 +101,61 @@ public class Task {
         this.status = status;
     }
 
+    public static DateTimeFormatter getFormatter() {return formatter;}
+
+    public Optional<LocalDateTime> getStartTime() {
+        return Optional.ofNullable(startTime);
+    }
+
+    public void setSchedule(LocalDateTime startTime, Duration duration) {
+        this.startTime = startTime;
+        this.duration = duration;
+    }
+
+    public Optional<Duration> getDuration() {
+        return Optional.ofNullable(duration);
+    }
+
+    public Optional<LocalDateTime> getEndTime() {
+        if (startTime != null && duration != null) {
+            return Optional.of(startTime.plus(duration));
+        }
+        return Optional.empty();
+    }
+
+    public String formatStartTime() {
+        Optional<LocalDateTime> startTimeOptional = getStartTime();
+        if(startTimeOptional.isPresent()) {
+            LocalDateTime startTimeFormat = startTimeOptional.get();
+            return startTimeFormat.format(formatter);
+        }
+        return "";
+    }
+
+    public String formatEndTime() {
+        Optional<LocalDateTime> endTimeOptional = getEndTime();
+        if(endTimeOptional.isPresent()) {
+            LocalDateTime endTimeFormat = endTimeOptional.get();
+            return endTimeFormat.format(formatter);
+        }
+        return "";
+    }
+
+    public Long formatDuration() {
+        Optional<Duration> durationOptional = getDuration();
+        return durationOptional.map(Duration::toMinutes).orElse(0L);
+    }
+
     @Override
     public String toString() {
-        return "task_manager.model.Task{" +
-                "id=" + id +
+        return  "id=" + id +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", status=" + status +
                 ", type=" + type +
-                '}';
+                ", startTime=" + formatStartTime() +
+                ", duration=" + formatDuration() +
+                ", endTime=" + formatEndTime();
     }
 
     @Override
