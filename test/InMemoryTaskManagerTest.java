@@ -25,6 +25,19 @@ class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager> {
     }
 
     @Test
+    void addSubTasksWithScheduleConflict() {
+        Epic epic = new Epic.Builder("epic", "description epic").build();
+        Integer epicId = manager.addEpic(epic);
+        SubTask subTask = new SubTask.Builder("subtask1", "description subtask1", epicId)
+                .schedule(LocalDateTime.now(), Duration.ofMinutes(20)).build();
+        SubTask subTaskConflict = new SubTask.Builder("subtaskConflict", "description subtaskConflict", epicId)
+                .schedule(LocalDateTime.now(), Duration.ofMinutes(5)).build();
+
+        manager.addTask(subTask);
+        Assertions.assertThrows(TaskOverlapException.class, () -> manager.addTask(subTaskConflict));
+    }
+
+    @Test
     void updateTasksWithSchedule() {
         Task task1 = new Task.Builder<>("task1", "description task1")
                 .schedule(LocalDateTime.now(), Duration.ofMinutes(20)).build();
