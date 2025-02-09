@@ -99,4 +99,23 @@ class InMemoryHistoryManagerTest extends InMemoryTaskManagerTest {
         Assertions.assertEquals(1, history.size(), "Неверное количество задач");
         Assertions.assertEquals(history.getFirst(), task2, "Сохранена неверная задача");
     }
+
+    @Test
+    void getHistory_WithCorrectRemoving_WhenDuplicateTaskAdded() {
+        Task task1 = new Task.Builder<>("Один", "Один").build();
+        Task task2 = new Task.Builder<>("Два", "Два").build();
+        Integer taskId1 = manager.addTask(task1);
+        Integer taskId2 = manager.addTask(task2);
+        manager.getTaskById(taskId1);
+        manager.getTaskById(taskId2);
+        List<Task> history = manager.getHistory();
+        Assertions.assertEquals(history.getFirst(), task1, "Сохранена неверная задача");
+        Assertions.assertEquals(history.getLast(), task2, "Сохранена неверная задача");
+
+        manager.getTaskById(taskId1);
+        List<Task> historyAfterDuplicate = manager.getHistory();
+        Assertions.assertEquals(task2, historyAfterDuplicate.getFirst(), "Сохранена неверная задача");
+        Assertions.assertEquals(task1, historyAfterDuplicate.getLast(), "Сохранена неверная задача");
+        Assertions.assertEquals(2, historyAfterDuplicate.size(), "Неверное количество задач");
+    }
 }
