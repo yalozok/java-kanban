@@ -1,180 +1,76 @@
-import org.junit.jupiter.api.BeforeEach;
 import taskmanager.model.*;
 import taskmanager.service.*;
-import taskmanager.model.TaskStatus;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 
-class InMemoryTaskManagerTest {
-    TaskManager manager;
-
-    @BeforeEach
-    void createManager() {
-        manager = new Manager().getDefault();
+class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager> {
+    @Override
+    InMemoryTaskManager createManager() {
+        return new InMemoryTaskManager();
     }
 
     @Test
-    void addTask() {
-        Task task = new Task("Помыть посуду", "Загрузить машинку");
-        Integer id = manager.addTask(task);
+    void addTasksWithScheduleConflict() {
+        Task task = new Task.Builder<>("task1", "description task1")
+                .schedule(LocalDateTime.now(), Duration.ofMinutes(20)).build();
+        Task taskConflict = new Task.Builder<>("taskConflict", "description taskConflict")
+                .schedule(LocalDateTime.now(), Duration.ofMinutes(5)).build();
 
-        Task taskSaved = manager.getTaskById(id);
-
-        Assertions.assertNotNull(taskSaved, "Задача не добавлена");
-        Assertions.assertEquals(task, taskSaved, "Задачи не совпадают");
-
-        List<Task> tasks = manager.getAllTasks();
-        Assertions.assertNotNull(tasks, "Задачи не возвращаются");
-        Assertions.assertEquals(1, tasks.size(), "Неверное количество задач");
-        Assertions.assertEquals(task, tasks.getFirst(), "Задачи не совпадают");
+        manager.addTask(task);
+        Assertions.assertThrows(TaskOverlapException.class, () -> manager.addTask(taskConflict));
     }
 
     @Test
-    void updateTask() {
-        Task task = new Task("Помыть посуду", "Загрузить машинку");
-        Integer id = manager.addTask(task);
+    void addSubTasksWithScheduleConflict() {
+        Epic epic = new Epic.Builder("epic", "description epic").build();
+        Integer epicId = manager.addEpic(epic);
+        SubTask subTask = new SubTask.Builder("subtask1", "description subtask1", epicId)
+                .schedule(LocalDateTime.now(), Duration.ofMinutes(20)).build();
+        SubTask subTaskConflict = new SubTask.Builder("subtaskConflict", "description subtaskConflict", epicId)
+                .schedule(LocalDateTime.now(), Duration.ofMinutes(5)).build();
 
-        manager.updateTask(new Task(id, "Помыть посуду", "Загрузить машинку", TaskStatus.DONE));
-        Task taskUpdated = manager.getTaskById(id);
-        Assertions.assertEquals(1, manager.getAllTasks().size(), "Неверное количество задач");
-        Assertions.assertNotEquals(task, taskUpdated, "Задача не обновилась");
+        manager.addTask(subTask);
+        Assertions.assertThrows(TaskOverlapException.class, () -> manager.addTask(subTaskConflict));
     }
 
     @Test
-    void deleteTask() {
-        Integer id1 = manager.addTask(new Task("Помыть посуду", "Загрузить машинку"));
-        Integer id2 = manager.addTask(new Task("Помыть собаку", "С шампунем"));
+    void updateTasksWithSchedule() {
+        Task task1 = new Task.Builder<>("task1", "description task1")
+                .schedule(LocalDateTime.now(), Duration.ofMinutes(20)).build();
+        Task task2 = new Task.Builder<>("task2", "description task2")
+                .schedule(LocalDateTime.now().plusHours(1), Duration.ofMinutes(5)).build();
 
-        manager.deleteTaskById(id1);
-        List<Task> tasks = manager.getAllTasks();
-        Assertions.assertEquals(1, tasks.size(), "Неверное количество задач");
-        Assertions.assertNull(manager.getTaskById(id1), "Задача не удалена");
+        Integer taskId1 = manager.addTask(task1);
+        Integer taskId2 = manager.addTask(task2);
+        List<Task> prioritizedTask = manager.getPrioritizedTasks();
+        Assertions.assertEquals(taskId1, prioritizedTask.getFirst().getId(), "Последовательность задач не верная");
 
-        manager.deleteAllTasks();
-        List<Task> tasksEmpty = manager.getAllTasks();
-        Assertions.assertEquals(0, tasksEmpty.size(), "Неверное количество задач");
+        Task task2Updated = new Task.Builder<>("taskUpdated", "description taskUpdated")
+                .id(taskId2).schedule(LocalDateTime.now().minusHours(1), Duration.ofMinutes(5)).build();
+        manager.updateTask(task2Updated);
+        List<Task> prioritizedTaskUpdated = manager.getPrioritizedTasks();
+        Assertions.assertEquals(taskId2, prioritizedTaskUpdated.getFirst().getId(), "Последовательность задач не верная");
     }
 
     @Test
-    void addEpic() {
-        Epic epic = new Epic("Выучить язык", "Английский");
+    void removeTaskWithSchedule() {
+        Task task1 = new Task.Builder<>("task1", "description task1")
+                .schedule(LocalDateTime.now(), Duration.ofMinutes(20)).build();
+        Task task2 = new Task.Builder<>("task2", "description task2")
+                .schedule(LocalDateTime.now().plusHours(1), Duration.ofMinutes(5)).build();
+        Integer taskId1 = manager.addTask(task1);
+        Integer taskId2 = manager.addTask(task2);
+        List<Task> prioritizedTask = manager.getPrioritizedTasks();
+        Assertions.assertEquals(2, prioritizedTask.size(), "Количество приоритетных задач не совпадает");
+        Assertions.assertEquals(taskId1, prioritizedTask.getFirst().getId(), "Последовательность задач не верная");
 
-        Integer id = manager.addEpic(epic);
-        Epic epicSaved = manager.getEpicById(id);
-        Assertions.assertNotNull(epicSaved, "task_manager.model.Epic не добавлен");
-        Assertions.assertEquals(epic, epicSaved, "Epics не совпадают");
-
-        List<Epic> epics = manager.getAllEpics();
-        Assertions.assertNotNull(epics, "Epics не возвращаются");
-        Assertions.assertEquals(1, epics.size(), "Количество epics не совпадает");
-        Assertions.assertEquals(epic, epics.getFirst(), "Epics не совпадают");
-    }
-
-    @Test
-    void addEpicWithSubTasks() {
-        Integer id = manager.addEpic(new Epic("Выучить язык", "Английский"));
-        SubTask subTask1 = new SubTask("Записаться на курсы", "Хорошие");
-        SubTask subTask2 = new SubTask("Купить книги", "Недорогие");
-
-        Epic epicSaved = manager.getEpicById(id);
-        manager.addSubTask(subTask1, id);
-        manager.addSubTask(subTask2, id);
-        List<Integer> subTaskIds = epicSaved.getSubTaskIds();
-
-        Assertions.assertNotNull(subTaskIds, "task_manager.model.SubTask ids не возвращаются");
-        Assertions.assertEquals(2, subTaskIds.size(), "Количество subtasks не совпадает");
-        Assertions.assertEquals(subTask1, manager.getSubTaskById(subTaskIds.getFirst()),
-                "SubTasks не совпадают");
-    }
-
-    @Test
-    void updateEpic() {
-        Epic epic = new Epic("Помыть посуду", "Загрузить машинку");
-        Integer id = manager.addEpic(epic);
-
-        manager.updateEpic(new Epic(id, "Помыть собаку", "Загрузить машинку"));
-        Epic epicUpdated = manager.getEpicById(id);
-        Assertions.assertEquals(1, manager.getAllEpics().size(), "Неверное количество epics");
-        Assertions.assertNotEquals(epic, epicUpdated, "task_manager.model.Epic не обновился");
-    }
-
-    @Test
-    void deleteEpicById() {
-        Integer epicId = manager.addEpic(new Epic("Выучить язык", "Английский"));
-        SubTask subTask1 = new SubTask("Записаться на курсы", "Хорошие");
-        SubTask subTask2 = new SubTask("Купить книги", "Недорогие");
-        manager.addSubTask(subTask1, epicId);
-        manager.addSubTask(subTask2, epicId);
-
-        List<Epic> epics = manager.getAllEpics();
-        List<SubTask> subtasks = manager.getAllSubTasks();
-        Assertions.assertEquals(1, epics.size(), "Неверное количество Epics");
-        Assertions.assertEquals(2, subtasks.size(), "Неверное количество SubTasks");
-
-        manager.deleteEpicById(epicId);
-        List<Epic> epicsAfterDeleting = manager.getAllEpics();
-        List<SubTask> subtasksAfterDeleting = manager.getAllSubTasks();
-        Assertions.assertEquals(0, epicsAfterDeleting.size(), "Неверное количество Epics");
-        Assertions.assertEquals(0, subtasksAfterDeleting.size(), "Неверное количество SubTasks");
-
-    }
-
-    @Test
-    void addSubTask() {
-        Integer epicId = manager.addEpic(new Epic("Выучить язык", "Английский"));
-        SubTask subTask = new SubTask("Записаться на курсы", "Хорошие");
-        Integer subTaskId = manager.addSubTask(subTask, epicId);
-
-        List<SubTask> subTasks = manager.getAllSubTasks();
-        Assertions.assertNotNull(subTasks, "task_manager.model.SubTask ids не возвращаются");
-        Assertions.assertEquals(subTask, subTasks.getFirst(), "SubTasks не совпадают");
-        Assertions.assertEquals(subTaskId, manager.getEpicById(epicId).getSubTaskIds().getFirst(),
-                "task_manager.model.SubTask id не закреплено за epic");
-    }
-
-    @Test
-    void shouldNotCreateSubtaskWithEpicIdAsSubTaskId() {
-        Integer epicId = manager.addEpic(new Epic("Выучить язык", "Английский"));
-        SubTask subTask = new SubTask("Записаться на курсы", "Хорошие");
-        subTask.setId(epicId);
-        subTask.setEpicId(epicId);
-
-        Integer subTaskId = manager.addSubTask(subTask, epicId);
-        Assertions.assertNotEquals(subTaskId, manager.getSubTaskById(subTaskId).getEpicId(),
-                "task_manager.model.SubTask id и epic id совпадают");
-    }
-
-    @Test
-    void updateSubTask() {
-        Integer epicId = manager.addEpic(new Epic("Выучить язык", "Английский"));
-        TaskStatus epicSavedStatus = manager.getEpicById(epicId).getStatus();
-        SubTask subTask = new SubTask("Записаться на курсы", "Хорошие");
-        Integer subtaskId = manager.addSubTask(subTask, epicId);
-        SubTask subTaskToUpdate = new SubTask(subtaskId, "Купить книги", subTask.getDescription(),
-                TaskStatus.IN_PROGRESS, epicId);
-
-        manager.updateSubTask(subTaskToUpdate);
-
-        Epic epicUpdated = manager.getEpicById(epicId);
-        SubTask subTaskUpdated = manager.getSubTaskById(subtaskId);
-        Assertions.assertEquals(1, manager.getAllSubTasks().size(), "Неверное количество subtasks");
-        Assertions.assertNotEquals(subTask, subTaskUpdated, "Subtask не обновился");
-        Assertions.assertNotEquals(epicSavedStatus, epicUpdated.getStatus(),
-                "Статусы epic совпадают после обновления");
-    }
-
-    @Test
-    void deleteSubTaskById() {
-        Integer epicId = manager.addEpic(new Epic("Выучить язык", "Английский"));
-        SubTask subTask1 = new SubTask("Записаться на курсы", "Хорошие");
-        Integer subtaskId = manager.addSubTask(subTask1, epicId);
-
-        manager.deleteSubTaskById(subtaskId);
-        List<SubTask> subtasks = manager.getAllSubTasks();
-        Assertions.assertEquals(0, subtasks.size(), "Неверное количество subtasks");
-        Assertions.assertEquals(0, manager.getEpicById(epicId).getSubTaskIds().size(),
-                "Неверное количество subtasks в epic");
+        manager.deleteTaskById(taskId1);
+        List<Task> prioritizedTaskUpdated = manager.getPrioritizedTasks();
+        Assertions.assertEquals(1, prioritizedTaskUpdated.size(), "Количество приоритетных задач не совпадает");
+        Assertions.assertEquals(taskId2, prioritizedTaskUpdated.getFirst().getId(), "Последовательность задач не верная");
     }
 }

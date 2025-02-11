@@ -1,31 +1,24 @@
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import taskmanager.model.Task;
 import taskmanager.service.FileBackedTaskManager;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-class FileBackedTaskManagerTest extends InMemoryTaskManagerTest {
+class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
     private Path tempFile;
 
-    void createManager(File file) {
-        manager = FileBackedTaskManager.loadFromFile(file);
-    }
-
-    @BeforeEach
-    public void setUpManager() {
+    @Override
+    FileBackedTaskManager createManager() {
         try {
             tempFile = Files.createTempFile("task", ".csv");
-            createManager(tempFile.toFile());
         } catch (IOException e) {
             System.out.println("Exception during creating temp file: " + e.getMessage());
         }
-
+        return FileBackedTaskManager.loadFromFile(tempFile.toFile());
     }
 
     @AfterEach
@@ -45,7 +38,7 @@ class FileBackedTaskManagerTest extends InMemoryTaskManagerTest {
 
     @Test
     void loadTaskFromFile() {
-        Task task = new Task("task1", "description task1");
+        Task task = new Task.Builder<>("task1", "description task1").build();
         manager.addTask(task);
         FileBackedTaskManager managerLoaded = FileBackedTaskManager.loadFromFile(tempFile.toFile());
 

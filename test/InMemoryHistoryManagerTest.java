@@ -9,14 +9,14 @@ import taskmanager.service.TaskManager;
 
 import java.util.List;
 
-class InMemoryHistoryManagerTest {
+class InMemoryHistoryManagerTest extends InMemoryTaskManagerTest {
     TaskManager manager = new Manager().getDefault();
 
     @Test
     void getHistory() {
-        Integer epicId = manager.addEpic(new Epic("Помыть посуду", "Загрузить машинку"));
-        Integer subtaskId = manager.addSubTask(new SubTask("Записаться на курсы", "Хорошие"), epicId);
-        Integer taskId = manager.addTask(new Task("Помыть посуду", "Загрузить машинку"));
+        Integer epicId = manager.addEpic(new Epic.Builder("Помыть посуду", "Загрузить машинку").build());
+        Integer subtaskId = manager.addSubTask(new SubTask.Builder("Записаться на курсы", "Хорошие", epicId).build());
+        Integer taskId = manager.addTask(new Task.Builder<>("Помыть посуду", "Загрузить машинку").build());
 
         Epic epicSaved = manager.getEpicById(epicId);
         SubTask subTaskSaved = manager.getSubTaskById(subtaskId);
@@ -32,9 +32,9 @@ class InMemoryHistoryManagerTest {
 
     @Test
     void getHistory_CorrectOrder() {
-        Integer taskId1 = manager.addTask(new Task("Один", "Один"));
-        Integer taskId2 = manager.addTask(new Task("Два", "Два"));
-        Integer taskId3 = manager.addTask(new Task("Три", "Три"));
+        Integer taskId1 = manager.addTask(new Task.Builder<>("Один", "Один").build());
+        Integer taskId2 = manager.addTask(new Task.Builder<>("Два", "Два").build());
+        Integer taskId3 = manager.addTask(new Task.Builder<>("Три", "Три").build());
 
         Task task3 = manager.getTaskById(taskId3);
         manager.getTaskById(taskId2);
@@ -51,10 +51,11 @@ class InMemoryHistoryManagerTest {
 
     @Test
     void getHistoryAfterUpdate() {
-        Integer taskId = manager.addTask(new Task("Помыть посуду", "Загрузить машинку"));
+        Integer taskId = manager.addTask(new Task.Builder<>("Помыть посуду", "Загрузить машинку").build());
         Task taskSaved = manager.getTaskById(taskId);
 
-        manager.updateTask(new Task(taskId, "Помыть посуду", "Загрузить машинку", TaskStatus.DONE));
+        manager.updateTask(new Task.Builder<>("Помыть посуду", "Загрузить машинку")
+                .id(taskId).status((TaskStatus.DONE)).build());
         Task taskUpdated = manager.getTaskById(taskId);
 
         List<Task> history = manager.getHistory();
@@ -66,9 +67,9 @@ class InMemoryHistoryManagerTest {
 
     @Test
     void getHistory_RemoveEpicWithSubtasks_SubTasksRemovedFromHistory() {
-        Integer epicId = manager.addEpic(new Epic("Выучить английский", "Разговорный"));
-        Integer subtaskId1 = manager.addSubTask(new SubTask("Записаться на курсы", "Хорошие"), epicId);
-        Integer subtaskId2 = manager.addSubTask(new SubTask("Найти репетитора", "С опытом"), epicId);
+        Integer epicId = manager.addEpic(new Epic.Builder("Выучить английский", "Разговорный").build());
+        Integer subtaskId1 = manager.addSubTask(new SubTask.Builder("Записаться на курсы", "Хорошие", epicId).build());
+        Integer subtaskId2 = manager.addSubTask(new SubTask.Builder("Найти репетитора", "С опытом", epicId).build());
 
         manager.getEpicById(epicId);
         manager.getSubTaskById(subtaskId1);
@@ -85,8 +86,8 @@ class InMemoryHistoryManagerTest {
 
     @Test
     void getHistory_RemoveTask() {
-        Integer taskId1 = manager.addTask(new Task("Один", "Один"));
-        Integer taskId2 = manager.addTask(new Task("Два", "Два"));
+        Integer taskId1 = manager.addTask(new Task.Builder<>("Один", "Один").build());
+        Integer taskId2 = manager.addTask(new Task.Builder<>("Два", "Два").build());
 
         manager.getTaskById(taskId1);
         manager.getTaskById(taskId2);
@@ -97,5 +98,24 @@ class InMemoryHistoryManagerTest {
         List<Task> history = manager.getHistory();
         Assertions.assertEquals(1, history.size(), "Неверное количество задач");
         Assertions.assertEquals(history.getFirst(), task2, "Сохранена неверная задача");
+    }
+
+    @Test
+    void getHistory_WithCorrectRemoving_WhenDuplicateTaskAdded() {
+        Task task1 = new Task.Builder<>("Один", "Один").build();
+        Task task2 = new Task.Builder<>("Два", "Два").build();
+        Integer taskId1 = manager.addTask(task1);
+        Integer taskId2 = manager.addTask(task2);
+        manager.getTaskById(taskId1);
+        manager.getTaskById(taskId2);
+        List<Task> history = manager.getHistory();
+        Assertions.assertEquals(history.getFirst(), task1, "Сохранена неверная задача");
+        Assertions.assertEquals(history.getLast(), task2, "Сохранена неверная задача");
+
+        manager.getTaskById(taskId1);
+        List<Task> historyAfterDuplicate = manager.getHistory();
+        Assertions.assertEquals(task2, historyAfterDuplicate.getFirst(), "Сохранена неверная задача");
+        Assertions.assertEquals(task1, historyAfterDuplicate.getLast(), "Сохранена неверная задача");
+        Assertions.assertEquals(2, historyAfterDuplicate.size(), "Неверное количество задач");
     }
 }

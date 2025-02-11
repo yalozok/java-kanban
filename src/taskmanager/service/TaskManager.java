@@ -31,11 +31,9 @@ public interface TaskManager {
 
     void deleteAllEpics();
 
-    Integer addSubTask(SubTask subTask, Integer epicId);
+    Integer addSubTask(SubTask subTask);
 
     SubTask getSubTaskById(Integer id);
-
-    List<SubTask> getAllSubTasksByEpic(Integer epicId);
 
     List<SubTask> getAllSubTasks();
 
@@ -46,5 +44,7 @@ public interface TaskManager {
     void deleteAllSubTasks();
 
     List<Task> getHistory();
+
+    List<Task> getPrioritizedTasks();
 }
 

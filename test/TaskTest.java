@@ -5,12 +5,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import taskmanager.model.TaskType;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.Optional;
+
 class TaskTest {
     private static Task task;
 
     @BeforeEach
     public void beforeEach() {
-        task = new Task(0, "Помыть посуду", "Загрузить машинку", TaskStatus.IN_PROGRESS);
+        task = new Task.Builder<>("Помыть посуду", "Загрузить машинку").id(0).status(TaskStatus.IN_PROGRESS).build();
     }
 
     @Test
@@ -51,8 +55,17 @@ class TaskTest {
 
     @Test
     void shouldBeEqualsIfIdsEquals() {
-        Task taskToCompare = new Task(0, "Помыть собаку", "Загрузить машинку", TaskStatus.IN_PROGRESS);
+        Task taskToCompare = new Task.Builder<>("Помыть собаку", "Загрузить машинку").id(0).status(TaskStatus.IN_PROGRESS).build();
         Assertions.assertNotEquals(task, taskToCompare,
                 "Task с одинаковым id должны быть равны");
+    }
+
+    @Test
+    void shouldCorrectCalculateTaskSchedule() {
+        LocalDateTime startTime = LocalDateTime.now();
+        Duration duration = Duration.ofMinutes(10);
+        Task scheduleTask = new Task.Builder<>("Task_schedule", "Description_Task_schedule")
+                .schedule(startTime, duration).build();
+        Assertions.assertEquals(scheduleTask.getEndTime(), Optional.of(startTime.plus(duration)), "Время окончания задачи рассчитано неверно");
     }
 }
