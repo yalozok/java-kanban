@@ -81,7 +81,7 @@ public class EpicHandler extends BaseHandler implements HttpHandler {
     private void handleStoreEpic(HttpExchange exchange) throws IOException {
         Optional<Integer> id = super.getId(exchange);
         Optional<String> epicStr = super.parseBody(exchange.getRequestBody());
-        if (!epicStr.isPresent()) {
+        if (epicStr.isEmpty()) {
             super.sendBadRequest(exchange);
             return;
         }
