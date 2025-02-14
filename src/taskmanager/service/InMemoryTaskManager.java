@@ -53,14 +53,14 @@ public class InMemoryTaskManager implements TaskManager {
         storeTask(task);
     }
 
-    private boolean hasTask(Integer id) {
+    public boolean hasTask(Integer id) {
         return tasks.containsKey(id);
     }
 
     @Override
     public Task getTaskById(Integer id) {
         if (!hasTask(id)) {
-            return null;
+            throw new NoSuchElementException("Task with ID " + id + " not found");
         }
         historyManager.add(tasks.get(id));
         return tasks.get(id);
@@ -92,6 +92,8 @@ public class InMemoryTaskManager implements TaskManager {
             prioritizedTasks.remove(task);
             tasks.remove(id);
             historyManager.remove(id);
+        } else {
+            throw new NoSuchElementException("Task with ID " + id + " not found");
         }
     }
 
@@ -100,7 +102,8 @@ public class InMemoryTaskManager implements TaskManager {
         if (tasks.isEmpty()) {
             return;
         }
-        for (Integer id : tasks.keySet()) {
+        List<Integer> taskIds = new ArrayList<>(tasks.keySet());
+        for (Integer id : taskIds) {
             deleteTaskById(id);
         }
     }
@@ -120,14 +123,14 @@ public class InMemoryTaskManager implements TaskManager {
         epics.put(id, epic);
     }
 
-    private boolean hasEpic(Integer id) {
+    public boolean hasEpic(Integer id) {
         return epics.containsKey(id);
     }
 
     @Override
     public Epic getEpicById(Integer id) {
         if (!hasEpic(id)) {
-            return null;
+            throw new NoSuchElementException("Epic with ID " + id + " not found");
         }
         historyManager.add(epics.get(id));
         return epics.get(id);
@@ -210,13 +213,13 @@ public class InMemoryTaskManager implements TaskManager {
         storeSubTask(subTask);
     }
 
-    private boolean hasSubTask(Integer id) {
+    public boolean hasSubTask(Integer id) {
         return subTasks.containsKey(id);
     }
 
     public SubTask getSubTaskById(Integer id) {
         if (!hasSubTask(id)) {
-            return null;
+            throw new NoSuchElementException("SubTask with ID " + id + " not found");
         }
         historyManager.add(subTasks.get(id));
         return subTasks.get(id);
@@ -232,6 +235,8 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void updateSubTask(SubTask subTask) {
+        System.out.println("SubTask in Update: " + subTask);
+
         if (!hasSubTask(subTask.getId()) || !hasEpic(subTask.getEpicId())) {
             return;
         }
