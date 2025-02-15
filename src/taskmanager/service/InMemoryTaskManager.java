@@ -28,20 +28,20 @@ public class InMemoryTaskManager implements TaskManager {
         Integer id = getId();
         task.setId(id);
         task.setStatus(TaskStatus.NEW);
-        return storeTask(task);
+        return storeTask(task, tasks);
     }
 
-    private Integer storeTask(Task task) {
+    private <T extends Task> Integer storeTask(T task, Map<Integer, T> storage) {
         Optional<LocalDateTime> startTimeOpt = task.getStartTime();
         Integer id = task.getId();
 
         if (startTimeOpt.isPresent() && validateSchedule(task)) {
             prioritizedTasks.add(task);
-            tasks.put(id, task);
+            storage.put(id, task);
             updateId();
             return id;
         } else if (startTimeOpt.isEmpty()) {
-            tasks.put(id, task);
+            storage.put(id, task);
             updateId();
             return id;
         } else {
@@ -50,17 +50,17 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     protected void addTaskFromFile(Task task) {
-        storeTask(task);
+        storeTask(task, tasks);
     }
 
-    private boolean hasTask(Integer id) {
+    public boolean hasTask(Integer id) {
         return tasks.containsKey(id);
     }
 
     @Override
     public Task getTaskById(Integer id) {
         if (!hasTask(id)) {
-            return null;
+            throw new NoSuchElementException("Task with ID " + id + " not found");
         }
         historyManager.add(tasks.get(id));
         return tasks.get(id);
@@ -81,7 +81,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void updateTask(Task task) {
         if (hasTask(task.getId())) {
-            storeTask(task);
+            storeTask(task, tasks);
         }
     }
 
@@ -92,6 +92,8 @@ public class InMemoryTaskManager implements TaskManager {
             prioritizedTasks.remove(task);
             tasks.remove(id);
             historyManager.remove(id);
+        } else {
+            throw new NoSuchElementException("Task with ID " + id + " not found");
         }
     }
 
@@ -100,7 +102,8 @@ public class InMemoryTaskManager implements TaskManager {
         if (tasks.isEmpty()) {
             return;
         }
-        for (Integer id : tasks.keySet()) {
+        List<Integer> taskIds = new ArrayList<>(tasks.keySet());
+        for (Integer id : taskIds) {
             deleteTaskById(id);
         }
     }
@@ -120,14 +123,14 @@ public class InMemoryTaskManager implements TaskManager {
         epics.put(id, epic);
     }
 
-    private boolean hasEpic(Integer id) {
+    public boolean hasEpic(Integer id) {
         return epics.containsKey(id);
     }
 
     @Override
     public Epic getEpicById(Integer id) {
         if (!hasEpic(id)) {
-            return null;
+            throw new NoSuchElementException("Epic with ID " + id + " not found");
         }
         historyManager.add(epics.get(id));
         return epics.get(id);
@@ -185,38 +188,20 @@ public class InMemoryTaskManager implements TaskManager {
         Epic epic = epics.get(epicId);
         epic.setSubTask(subTask);
         updateId();
-        return storeSubTask(subTask);
-    }
-
-    private Integer storeSubTask(SubTask subTask) {
-        Optional<LocalDateTime> startTimeOpt = subTask.getStartTime();
-        Integer id = subTask.getId();
-
-        if (startTimeOpt.isPresent() && validateSchedule(subTask)) {
-            prioritizedTasks.add(subTask);
-            subTasks.put(id, subTask);
-            updateId();
-            return id;
-        } else if (startTimeOpt.isEmpty()) {
-            subTasks.put(id, subTask);
-            updateId();
-            return id;
-        } else {
-            throw new TaskOverlapException();
-        }
+        return storeTask(subTask, subTasks);
     }
 
     protected void addSubTaskFromFile(SubTask subTask) {
-        storeSubTask(subTask);
+        storeTask(subTask, subTasks);
     }
 
-    private boolean hasSubTask(Integer id) {
+    public boolean hasSubTask(Integer id) {
         return subTasks.containsKey(id);
     }
 
     public SubTask getSubTaskById(Integer id) {
         if (!hasSubTask(id)) {
-            return null;
+            throw new NoSuchElementException("SubTask with ID " + id + " not found");
         }
         historyManager.add(subTasks.get(id));
         return subTasks.get(id);
@@ -232,12 +217,14 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void updateSubTask(SubTask subTask) {
+        System.out.println("SubTask in Update: " + subTask);
+
         if (!hasSubTask(subTask.getId()) || !hasEpic(subTask.getEpicId())) {
             return;
         }
         Epic epic = epics.get(subTask.getEpicId());
         epic.updateSubTask(subTask);
-        storeSubTask(subTask);
+        storeTask(subTask, subTasks);
     }
 
     @Override

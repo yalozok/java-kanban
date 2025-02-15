@@ -46,5 +46,11 @@ public interface TaskManager {
     List<Task> getHistory();
 
     List<Task> getPrioritizedTasks();
+
+    boolean hasTask(Integer integer);
+
+    boolean hasEpic(Integer integer);
+
+    boolean hasSubTask(Integer integer);
 }
 

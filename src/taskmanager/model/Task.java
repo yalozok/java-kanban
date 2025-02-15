@@ -165,12 +165,15 @@ public class Task implements Comparable<Task> {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Task task = (Task) o;
-        return Objects.equals(id, task.id) && Objects.equals(name, task.name) && Objects.equals(description, task.description) && status == task.status && type == task.type;
+        return Objects.equals(id, task.id) && Objects.equals(name, task.name) &&
+                Objects.equals(description, task.description) && status == task.status &&
+                type == task.type && Objects.equals(duration, task.duration) &&
+                Objects.equals(startTime, task.startTime);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, status, type);
+        return Objects.hash(id, name, description, status, type, duration, startTime);
     }
 
     @Override
@@ -183,6 +186,7 @@ public class Task implements Comparable<Task> {
             return -1;
         }
         return Comparator.comparing((Task task) -> task.getStartTime().get(), Comparator.naturalOrder())
+                .thenComparing(task -> task.getEndTime().orElse(LocalDateTime.MAX))
                 .thenComparing(Task::getId)
                 .compare(this, otherTask);
     }
