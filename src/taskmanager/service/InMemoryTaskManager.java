@@ -28,20 +28,20 @@ public class InMemoryTaskManager implements TaskManager {
         Integer id = getId();
         task.setId(id);
         task.setStatus(TaskStatus.NEW);
-        return storeTask(task);
+        return storeTask(task, tasks);
     }
 
-    private Integer storeTask(Task task) {
+    private <T extends Task> Integer storeTask(T task, Map<Integer, T> storage) {
         Optional<LocalDateTime> startTimeOpt = task.getStartTime();
         Integer id = task.getId();
 
         if (startTimeOpt.isPresent() && validateSchedule(task)) {
             prioritizedTasks.add(task);
-            tasks.put(id, task);
+            storage.put(id, task);
             updateId();
             return id;
         } else if (startTimeOpt.isEmpty()) {
-            tasks.put(id, task);
+            storage.put(id, task);
             updateId();
             return id;
         } else {
@@ -50,7 +50,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     protected void addTaskFromFile(Task task) {
-        storeTask(task);
+        storeTask(task, tasks);
     }
 
     public boolean hasTask(Integer id) {
@@ -81,7 +81,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void updateTask(Task task) {
         if (hasTask(task.getId())) {
-            storeTask(task);
+            storeTask(task, tasks);
         }
     }
 
@@ -188,29 +188,11 @@ public class InMemoryTaskManager implements TaskManager {
         Epic epic = epics.get(epicId);
         epic.setSubTask(subTask);
         updateId();
-        return storeSubTask(subTask);
-    }
-
-    private Integer storeSubTask(SubTask subTask) {
-        Optional<LocalDateTime> startTimeOpt = subTask.getStartTime();
-        Integer id = subTask.getId();
-
-        if (startTimeOpt.isPresent() && validateSchedule(subTask)) {
-            prioritizedTasks.add(subTask);
-            subTasks.put(id, subTask);
-            updateId();
-            return id;
-        } else if (startTimeOpt.isEmpty()) {
-            subTasks.put(id, subTask);
-            updateId();
-            return id;
-        } else {
-            throw new TaskOverlapException();
-        }
+        return storeTask(subTask, subTasks);
     }
 
     protected void addSubTaskFromFile(SubTask subTask) {
-        storeSubTask(subTask);
+        storeTask(subTask, subTasks);
     }
 
     public boolean hasSubTask(Integer id) {
@@ -242,7 +224,7 @@ public class InMemoryTaskManager implements TaskManager {
         }
         Epic epic = epics.get(subTask.getEpicId());
         epic.updateSubTask(subTask);
-        storeSubTask(subTask);
+        storeTask(subTask, subTasks);
     }
 
     @Override
