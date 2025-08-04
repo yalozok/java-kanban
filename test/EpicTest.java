@@ -18,8 +18,8 @@ class EpicTest {
 
     @BeforeEach
     public void beforeEach() {
-        subTasks.add(new SubTask.Builder("SubTask1", "Description SubTask1", 0).build());
-        subTasks.add(new SubTask.Builder("SubTask2", "Description SubTask2", 0).build());
+        subTasks.add(new SubTask.Builder("SubTask1", "Description SubTask1", 0).id(1).status(TaskStatus.NEW).build());
+        subTasks.add(new SubTask.Builder("SubTask2", "Description SubTask2", 0).id(2).status(TaskStatus.NEW).build());
         epic = new Epic.Builder("Помыть посуду", "Загрузить машинку").id(0).subTasks(subTasks).build();
     }
 
@@ -134,6 +134,18 @@ class EpicTest {
                 .id(2).subTasks(listSubTasks).build();
         epicForStatus.updateStatus();
         Assertions.assertEquals(TaskStatus.IN_PROGRESS, epicForStatus.getStatus(), "Статус вычисляется неверно");
+    }
+
+    @Test
+    void shouldCorrectUpdateStatusAfterStatusUpdatedInSubTask() {
+        epic.updateStatus();
+        Assertions.assertEquals(TaskStatus.NEW, epic.getStatus(), "Статус вычисляется неверно");
+        SubTask subtaskFirst = epic.getSubTasks().getFirst();
+
+        epic.updateSubTask(new SubTask.Builder(subtaskFirst.getName(), subtaskFirst.getDescription(), epic.getId())
+                .id(subtaskFirst.getId()).status(TaskStatus.DONE).build());
+        epic.updateStatus();
+        Assertions.assertEquals(TaskStatus.IN_PROGRESS, epic.getStatus(), "Статус вычисляется неверно");
     }
 
 }

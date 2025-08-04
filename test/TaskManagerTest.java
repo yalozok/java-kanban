@@ -1,15 +1,13 @@
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import taskmanager.model.Epic;
-import taskmanager.model.SubTask;
-import taskmanager.model.Task;
-import taskmanager.model.TaskStatus;
+import taskmanager.model.*;
 import taskmanager.service.TaskManager;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 abstract class TaskManagerTest<T extends TaskManager> {
     T manager;
@@ -56,7 +54,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
         manager.deleteTaskById(id1);
         List<Task> tasks = manager.getAllTasks();
         Assertions.assertEquals(1, tasks.size(), "Неверное количество задач");
-        Assertions.assertNull(manager.getTaskById(id1), "Задача не удалена");
+        Assertions.assertThrows(NoSuchElementException.class, () -> manager.deleteTaskById(id1));
 
         manager.deleteAllTasks();
         List<Task> tasksEmpty = manager.getAllTasks();
